@@ -15,7 +15,7 @@ public static class ToolkitPower {
   [DllImport("kernel32.dll")] public static extern uint SetThreadExecutionState(uint flags);
   public static void Hold() {
     if (SetThreadExecutionState(0x80000001) == 0) throw new Exception("Power assertion failed");
-    try { Thread.Sleep(30000); } finally { SetThreadExecutionState(0x80000000); }
+    try { Console.WriteLine("ready"); Console.Out.Flush(); Thread.Sleep(30000); } finally { SetThreadExecutionState(0x80000000); }
   }
 }`;
 function powershell(body) {

@@ -195,13 +195,13 @@ class EditorTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_workspace_shortcut_offers_followup_without_starting_worker(self):
         r = self.record
-        r.update(stage="delivered", name="worker", pane="4", terminal_id="t", generation="g", target={"path": "/clicked", "repo": "/clicked"})
+        r.update(stage="delivered", name="worker", pane="4", terminal_id="t", generation="g", target={"path": self.tmp.name, "repo": self.tmp.name})
         save_record(self.app.store, r)
-        agent = {"name": "worker", "agent": "codex", "pane": "4", "terminal_id": "t", "generation": "g", "cwd": "/clicked"}
+        agent = {"name": "worker", "agent": "codex", "pane": "4", "terminal_id": "t", "generation": "g", "cwd": self.tmp.name}
         async with self.app.run_test(size=(100, 35)) as pilot:
             await pilot.pause()
-            with patch("luvus_tasks.console.repository", return_value="/clicked"), patch("luvus_tasks.console.git", return_value="feature/existing"), patch.object(self.app.host, "agents", return_value=[agent]), patch.object(self.app, "choice", new_callable=AsyncMock, return_value="follow-up") as choose, patch.object(self.app, "history_action", new_callable=AsyncMock) as action:
-                await self.app.workspace_handover({"workspace": {"cwd": "/clicked"}})
+            with patch("luvus_tasks.console.repository", return_value=self.tmp.name), patch("luvus_tasks.console.git", return_value="feature/existing"), patch.object(self.app.host, "agents", return_value=[agent]), patch.object(self.app, "choice", new_callable=AsyncMock, return_value="follow-up") as choose, patch.object(self.app, "history_action", new_callable=AsyncMock) as action:
+                await self.app.workspace_handover({"workspace": {"cwd": self.tmp.name}})
                 self.assertIn("feature/existing", choose.call_args.args[0])
                 action.assert_awaited_once_with("follow-up")
                 self.assertEqual(len(self.app.store.records("handovers")), 1)

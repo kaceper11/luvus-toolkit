@@ -1,6 +1,7 @@
 """Task evidence and cross-module contracts. No second command runner."""
 from __future__ import annotations
 
+from contextlib import closing
 import copy
 import hashlib
 import json
@@ -443,7 +444,7 @@ def bundle_api(root):
         if request.get("version") != 1 or not request.get("request_id") or not Path(request.get("cwd", "")).is_absolute():
             raise TaskError("Version, request ID and absolute cwd required.")
         cwd = os.path.normcase(str(Path(request["cwd"]).resolve()))
-        with sqlite3.connect((Path(root).resolve() / "tasks.sqlite3").as_uri() + "?mode=ro", uri=True) as db:
+        with closing(sqlite3.connect((Path(root).resolve() / "tasks.sqlite3").as_uri() + "?mode=ro", uri=True)) as db:
             bundles = [bundle_snapshot(json.loads(row[0])) for row in db.execute("SELECT data FROM preferences WHERE key LIKE 'bundle:%'")]
         bundles = [b for b in bundles if any(m["cwd"] == cwd for m in b["members"])]
         if request.get("operation") == "bundles.list":

@@ -423,7 +423,7 @@ class LauncherApp(App):
         except Exception as error:
             await self.message("Couldn't complete that action", str(error))
         finally:
-            if self.is_mounted:
+            if self.is_mounted and self.query("#dashboard"):
                 self.busy = False
                 self.query_one("#dashboard").disabled = False
                 try:

@@ -257,13 +257,15 @@ class LauncherTests(unittest.TestCase):
                         reaped = True
                         self.assertEqual(status, 0)
                         break
-                    time.sleep(.02)
+                    if select.select([master], [], [], .02)[0]:
+                        try: os.read(master, 8192)
+                        except OSError: pass  # EOF may be reported as EIO on a PTY.
                 self.assertTrue(reaped, "Picker did not close")
             finally:
+                os.close(master)
                 if not reaped:
                     child.kill()
                     child.wait(timeout=5)
-                os.close(master)
 
 
 if __name__ == "__main__":

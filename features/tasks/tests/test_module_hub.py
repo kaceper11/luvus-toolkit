@@ -59,3 +59,5 @@ class DirectTasksTests(unittest.IsolatedAsyncioTestCase):
                 self.assertTrue(app.busy)
                 self.assertEqual(app.store.records('handovers'), before)
                 app.busy = False
+
+            app.store.db.close()

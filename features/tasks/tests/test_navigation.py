@@ -11,7 +11,7 @@ from luvus_tasks.console import Cockpit
 from luvus_tasks.core import TaskError, default_config
 from luvus_tasks import operations as ops, workflow_ui
 from luvus_tasks.handover import save_record
-from test_console import Host, TICKET, CONNECTION
+from test_console import Host, TICKET, CONNECTION, wait_until
 
 
 class NavigationTests(unittest.IsolatedAsyncioTestCase):
@@ -31,6 +31,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(self.app.active_editor().record['id'], record['id'])
             self.app.dispatch('task-next-attention')
             await pilot.pause()
+            await wait_until(pilot, lambda: self.app.query_one('#tabs', TabbedContent).active == 'attention')
             self.assertEqual(self.app.query_one('#tabs', TabbedContent).active, 'attention')
             with patch.object(self.app, 'copy_data', new=AsyncMock()) as copied:
                 self.app.dispatch('copy')
@@ -99,6 +100,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 finally:
                     gate.set()
                 await pilot.pause()
+                await wait_until(pilot, lambda: self.app.query_one('#tabs', TabbedContent).active == 'attention')
                 self.assertEqual(self.app.query_one('#tabs', TabbedContent).active, 'attention')
                 self.assertEqual(editor.record['agent'], saved_agent)
 
@@ -180,6 +182,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             await pilot.pause()
             await self.app.navigate('show-attention').wait()
             self.assertIsNone(await worker.wait())
+            await wait_until(pilot, lambda: self.app.query_one('#tabs', TabbedContent).active == 'attention')
             self.assertEqual(self.app.query_one('#tabs', TabbedContent).active, 'attention')
             reopened = self.app.run_worker(self.app.form('Context notes', fields))
             await pilot.pause()
@@ -260,12 +263,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_stopped_existing_draft_is_offered_without_creating_another(self):
         record = ops.draft(self.app.store, TICKET)
-        record['inputs'].update(repo='/clicked', new=False)
+        record['inputs'].update(repo=self.temp.name, new=False)
         save_record(self.app.store, record)
         async with self.app.run_test() as pilot:
             await pilot.pause()
-            with patch('luvus_tasks.console.repository', return_value='/clicked'), patch('luvus_tasks.console.git', return_value='feature'), patch.object(self.app, 'choice', AsyncMock(return_value=record['id'])), patch.object(self.app, 'wizard', AsyncMock()) as wizard:
-                await self.app.workspace_handover({'workspace': {'cwd': '/clicked'}})
+            with patch('luvus_tasks.console.repository', return_value=self.temp.name), patch('luvus_tasks.console.git', return_value='feature'), patch.object(self.app, 'choice', AsyncMock(return_value=record['id'])), patch.object(self.app, 'wizard', AsyncMock()) as wizard:
+                await self.app.workspace_handover({'workspace': {'cwd': self.temp.name}})
             wizard.assert_awaited_once()
             self.assertEqual(len(self.app.store.records('handovers')), 1)
 
@@ -273,9 +276,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         async with self.app.run_test() as pilot:
             await pilot.pause()
             self.app.tasks = [TICKET]
-            with patch('luvus_tasks.console.repository', return_value='/clicked'), patch('luvus_tasks.console.git', return_value='feature'), patch('luvus_tasks.operations.ticket_matches', return_value=False):
+            with patch('luvus_tasks.console.repository', return_value=self.temp.name), patch('luvus_tasks.console.git', return_value='feature'), patch('luvus_tasks.operations.ticket_matches', return_value=False):
                 with self.assertRaisesRegex(TaskError, 'repository mapping'):
-                    await self.app.workspace_handover({'workspace': {'cwd': '/clicked'}})
+                    await self.app.workspace_handover({'workspace': {'cwd': self.temp.name}})
             self.assertEqual(self.app.store.records('handovers'), [])
 
     async def test_rejected_console_open_does_not_leave_surprise_queued_action(self):
@@ -283,5 +286,5 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         host.call.return_value = {'server_generation': 'g', 'terminals': []}
         self.app.store.set_preference('console:' + ops.session_key(), {'pending': True, 'generation': 'g'})
         with self.assertRaisesRegex(TaskError, 'uncertain'):
-            ops.open_console(self.app.store, host, action='workspace-handover', context={'workspace': {'cwd': '/clicked'}})
+            ops.open_console(self.app.store, host, action='workspace-handover', context={'workspace': {'cwd': self.temp.name}})
         self.assertEqual(self.app.store.records('inbox'), [])

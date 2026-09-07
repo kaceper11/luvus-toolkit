@@ -16,6 +16,13 @@ from luvus_tasks import operations as ops
 from luvus_tasks.handover import save_record
 
 
+async def wait_until(pilot, predicate):
+    for _ in range(100):
+        if predicate(): return
+        await pilot.pause(0.05)
+    raise AssertionError("UI did not reach the expected state within five seconds")
+
+
 TICKET = {"provider": "Azure DevOps", "connection": "azure", "project": "Example", "id": "1", "key": "AB#1",
           "title": "Fix [red]literal markup[/red]", "status": "Active", "description": "Description", "acceptance": "Tests pass",
           "url": "https://dev.azure.com/example/Example/_workitems/edit/1", "rev": 1}
@@ -333,10 +340,13 @@ class ConsoleTests(unittest.IsolatedAsyncioTestCase):
             await pilot.pause()
             await pilot.click("#--content-tab-configuration")
             await pilot.click("#connections")
+            await wait_until(pilot, lambda: self.app.query(InlineForm) and self.app.query_one(InlineForm).query(Select) and self.app.query_one(InlineForm).query_one(Select).value == "new")
             self.app.query_one(InlineForm).query_one(Select).value = "azure"
             await pilot.click("#submit")
+            await wait_until(pilot, lambda: self.app.query(InlineForm) and self.app.query_one(InlineForm).query(Select) and self.app.query_one(InlineForm).query_one(Select).value == "edit")
             self.app.query_one(InlineForm).query_one(Select).value = "remove"
             await pilot.click("#submit")
+            await wait_until(pilot, lambda: bool(self.app.query("#credential")))
             self.assertEqual(len(self.app.store.config()["connections"]), 1)
             await pilot.click("#submit")
             await pilot.pause()
@@ -357,6 +367,7 @@ class ConsoleTests(unittest.IsolatedAsyncioTestCase):
         async with self.app.run_test(size=(120, 40)) as pilot:
             await pilot.pause()
             await pilot.click("#actions")
+            await wait_until(pilot, lambda: self.app.screen.query("#submit") and self.app.screen.query(Select) and self.app.screen.query_one(Select).value == "Handover")
             self.app.screen.query_one(Select).value = "Pin / unpin"
             await pilot.click("#submit")
             await pilot.pause()
@@ -368,7 +379,9 @@ class ConsoleTests(unittest.IsolatedAsyncioTestCase):
             self.app.query_one("#tabs", TabbedContent).active = "configuration"
             await pilot.pause()
             await pilot.click("#prompts")
+            await wait_until(pilot, lambda: self.app.query(InlineForm) and self.app.query_one(InlineForm).query(Select) and self.app.query_one(InlineForm).query_one(Select).value == "global")
             await pilot.click("#submit")
+            await wait_until(pilot, lambda: bool(self.app.query("#text")))
             self.app.query_one(InlineForm).query_one("#text", TextArea).load_text("Unsaved instructions")
             await pilot.click("#cancel")
             self.assertTrue(self.app.screen.query("#discard"))
@@ -381,10 +394,13 @@ class ConsoleTests(unittest.IsolatedAsyncioTestCase):
             await pilot.pause()
             self.app.checked.add("azure:1")
             await pilot.click("#actions")
+            await wait_until(pilot, lambda: self.app.screen.query("#submit") and self.app.screen.query(Select) and self.app.screen.query_one(Select).value == "Handover")
             self.app.screen.query_one(Select).value = "Prepare selected drafts"
+            previous = self.app.screen
             await pilot.click("#submit")
+            await wait_until(pilot, lambda: self.app.screen is not previous and bool(self.app.screen.query("#submit")))
             await pilot.click("#submit")
-            await pilot.pause()
+            await wait_until(pilot, lambda: len(self.app.store.records("handovers")) == 1)
             records = self.app.store.records("handovers")
             self.assertEqual(len(records), 1)
             self.assertEqual(records[0]["stage"], "draft")

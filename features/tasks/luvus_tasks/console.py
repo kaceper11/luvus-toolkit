@@ -583,7 +583,8 @@ class Cockpit(App):
 
     def save_warning(self):
         failed = [e.record["ticket"]["key"] for e in self.editors.values() if e.save_failed]
-        self.query_one("#save-warning", Static).update("Unsaved drafts retained: " + ", ".join(failed) + ". Open the draft and retry Save." if failed else "")
+        for warning in self.query("#save-warning"):
+            warning.update("Unsaved drafts retained: " + ", ".join(failed) + ". Open the draft and retry Save." if failed else "")
 
     def on_resize(self, event):
         self.set_class(event.size.width < 110, "narrow")

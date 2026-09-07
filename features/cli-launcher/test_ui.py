@@ -318,6 +318,9 @@ class AgentWizardTests(unittest.IsolatedAsyncioTestCase):
             self.value("destination", str(Path(self.cwd).parent / (Path(self.cwd).name + "-work")))
             await pilot.press("ctrl+s")
             await pilot.pause()
+            for _ in range(100):
+                if self.app.screen.query(".form-help") and "work/test" in str(self.app.screen.query_one(".form-help").render()): break
+                await pilot.pause(0.05)
             self.assertIn("work/test", str(self.app.screen.query_one(".form-help").render()))
             self.assertFalse(self.presets.with_name("agent-launch.json").exists())
             await pilot.press("escape")

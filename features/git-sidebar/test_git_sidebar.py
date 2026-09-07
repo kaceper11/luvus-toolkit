@@ -187,7 +187,7 @@ def run():
             # Linked worktree gets its own repository and HEAD identity.
             worktree = folder / "linked worktree"
             app.git(repo, "worktree", "add", "-b", "linked", str(worktree))
-            assert app.root(worktree) == str(worktree.resolve())
+            assert Path(app.root(worktree)).resolve() == worktree.resolve()
             assert target(worktree) != target(repo)
 
             # Repository choices are clickable, deduplicated, and exclude non-Git folders.
@@ -298,7 +298,7 @@ def run():
 
             # Payload round-trip preserves exact repository and filenames.
             values = [r["value"] for r in app.rows(target(repo)) if "value" in r]
-            assert all(json.loads(v)["repo"] == str(repo.resolve()) for v in values)
+            assert all(Path(json.loads(v)["repo"]).resolve() == repo.resolve() for v in values)
             assert "\x1b" not in app.display("unsafe\x1b[2J\n")
             with patch.object(app, "luvus", return_value={"pane": "test-pane"}) as host:
                 app.open_terminal("commit", target(repo))
