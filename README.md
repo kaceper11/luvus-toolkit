@@ -12,7 +12,7 @@ One installable Luvus module containing seven feature areas:
 | AI Usage | Codex, Claude, OpenCode, Muse and Copilot usage |
 | Keep Awake | Prevent idle system sleep while agents work |
 
-**Status: migration candidate.** The combined module is tested on macOS. Windows and WSL2 implementations are included, but full platform and authenticated-provider acceptance is still pending. Existing installations should be retained until those checks pass. See [VALIDATION.md](VALIDATION.md).
+**Status: migration candidate.** Automated checks pass on macOS, Linux and native Windows, including a fresh Windows installation. WSL2 and authenticated-provider acceptance on the target platforms remain pending. Existing installations should be retained until those checks pass. See [VALIDATION.md](VALIDATION.md).
 
 ## Install
 
