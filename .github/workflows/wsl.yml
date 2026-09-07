@@ -14,8 +14,6 @@ jobs:
           wsl --status
           wsl --install --distribution Ubuntu-24.04 --no-launch
           if ($LASTEXITCODE -ne 0) { throw 'WSL distribution installation failed' }
-          wsl --set-version Ubuntu-24.04 2
-          if ($LASTEXITCODE -ne 0) { throw 'WSL2 is required' }
           wsl --list --verbose
       - name: Validate inside WSL2
         shell: pwsh
