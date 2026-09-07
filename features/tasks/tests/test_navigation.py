@@ -28,6 +28,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(self.app.busy)
             self.app.dispatch('task-start')
             await pilot.pause()
+            await self.app.workers.wait_for_complete()
             await wait_until(pilot, lambda: self.app.active_editor() is not None)
             self.assertEqual(self.app.active_editor().record['id'], record['id'])
             self.app.dispatch('task-next-attention')

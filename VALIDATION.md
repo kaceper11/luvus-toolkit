@@ -10,6 +10,12 @@
 - Real durable configuration copied successfully to an isolated destination, with known Launcher connections rewritten to Toolkit. Production cutover remains pending.
 - Original module checkouts and live registrations have not been removed or replaced.
 
+## Cross-platform CI
+
+- macOS and Linux test matrices have passed.
+- Native Windows power assertion lifetime passed with the standard-library Windows API helper.
+- Windows tests and a fresh native Luvus installation are being validated; full WSL2 and authenticated-provider acceptance remain pending.
+
 ## Required before final cutover and deletion
 
 - Repeat fresh installation on Windows and WSL2, including the native build step.
