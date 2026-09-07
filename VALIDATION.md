@@ -8,8 +8,9 @@
 - A fresh installation from public commit `5b9df1f` passed its native build and doctor checks in a disposable home.
 - The native power assertion helper expired after parent exit within 40 seconds; macOS also reported the owned PreventUserIdleSystemSleep assertion.
 - Read-only authenticated Codex collection returned three quota windows and 50 recent local sessions. Muse collection returned 11 local sessions. OpenCode and Copilot executables were unavailable on this workstation; no credentials were transferred to CI.
-- Real durable configuration copied successfully to an isolated destination, with known Launcher connections rewritten to Toolkit. Production cutover remains pending.
-- Original module checkouts and live registrations have not been removed or replaced.
+- Local macOS cutover completed: nine durable files migrated, three SQLite databases passed integrity checks, and repeat migration found no outstanding copies. Known Launcher connections now use Toolkit entrypoints.
+- Toolkit is the sole enabled, runnable module. Doctor, Git refresh and usage refresh passed; the Tasks interface loaded the migrated issues and handover history without command-log failures.
+- Seven legacy registrations and local source directories, plus six legacy GitHub repositories, were removed after source-hash, Git backup and branch/worktree checks. Private source/state backups and existing project worktrees were retained. No Claude status-line restoration record was present.
 
 ## Cross-platform CI
 
@@ -20,11 +21,9 @@
 - Full WSL2 and cross-platform authenticated-provider acceptance remain pending. The manual WSL2 workflow installs a disposable distribution and validates its actual kernel before testing.
 - The hosted WSL2 runner booted Ubuntu during setup development, but the final workflow and its retry timed out installing the distribution before module tests could run ([run](https://github.com/kaceper11/luvus-toolkit/actions/runs/34111907803)). Run the manual workflow again when distribution setup is available, or validate on an accessible WSL2 computer. This is not a passing module acceptance result.
 
-## Required before final cutover and deletion
+## Remaining platform acceptance
 
 - Fresh WSL2 installation, real-Luvus smoke checks, paths/quoting, process shutdown and host power assertion expiry.
 - Authenticated checks of each optional provider on the intended platforms. Unsupported upstream tool behavior must be resolved or reported as a blocker, not silently hidden.
-- Preview/apply/readback of existing durable state, credential references and external Claude wrapper restoration/reconnection.
-- Verify remote backups, unique branches/worktrees and repository metadata before deleting the six old remotes and seven old feature directories.
 
 Platform declarations describe implementation targets, not completed acceptance. Hosted Linux checks alone do not establish WSL2 behavior or physical power-management correctness.
