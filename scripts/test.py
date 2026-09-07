@@ -16,7 +16,7 @@ for feature in ['cli-launcher','git-sidebar','project-commands','send-to-agent',
     command = [sys.executable, '-c', 'import faulthandler, unittest; faulthandler.dump_traceback_later(120, repeat=True); unittest.main(module=None)', 'discover', '-s', 'tests' if (folder / 'tests').exists() else '.', '-v']
     try:
         result = subprocess.run(command, cwd=folder, timeout=900 if os.name == 'nt' and feature == 'tasks' else 600)
-        if result.returncode: failed.append(feature)
+        if result.returncode: failed.append(f'{feature} (exit {result.returncode})')
         if feature == 'git-sidebar':
             result = subprocess.run([sys.executable, 'test_git_sidebar.py'], cwd=folder, timeout=60)
             if result.returncode: failed.append('git-sidebar scenarios')

@@ -400,8 +400,9 @@ class ConsoleTests(unittest.IsolatedAsyncioTestCase):
             self.app.screen.query_one(Select).value = "Prepare selected drafts"
             previous = self.app.screen
             await pilot.click("#submit")
-            await wait_until(pilot, lambda: self.app.screen is not previous and bool(self.app.screen.query("#submit")))
-            await pilot.click("#submit")
+            await wait_until(pilot, lambda: isinstance(self.app.screen, Form) and self.app.screen is not previous and self.app.screen.heading == "Prepare drafts only" and bool(self.app.screen.query("#submit")))
+            await pilot.pause()
+            self.assertTrue(await pilot.click("#submit"))
             await wait_until(pilot, lambda: len(self.app.store.records("handovers")) == 1)
             records = self.app.store.records("handovers")
             self.assertEqual(len(records), 1)
