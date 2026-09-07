@@ -18,7 +18,9 @@ from luvus_tasks.handover import save_record
 
 async def wait_until(pilot, predicate):
     for _ in range(100):
-        if predicate(): return
+        if predicate():
+            await pilot.pause()
+            return
         await pilot.pause(0.05)
     raise AssertionError("UI did not reach the expected state within five seconds")
 
