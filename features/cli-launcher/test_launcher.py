@@ -219,14 +219,6 @@ class LauncherTests(unittest.TestCase):
 
     @unittest.skipIf(os.name == "nt", "POSIX controlling-terminal regression")
     def test_picker_keeps_controlling_terminal_after_tool_exit(self):
-        # forkpty must run in a fresh interpreter on macOS, before other tests
-        # initialize libraries with process-global locks.
-        if not os.environ.get("TOOLKIT_PTY_TEST_CHILD"):
-            result = subprocess.run([sys.executable, "-m", "unittest", self.id()],
-                                    env={**os.environ, "TOOLKIT_PTY_TEST_CHILD": "1"},
-                                    capture_output=True, text=True, timeout=25)
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            return
         import pty
         import select
         import signal
@@ -234,10 +226,15 @@ class LauncherTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             config = Path(directory) / "presets.json"
             config.write_text(json.dumps([{"name": "Check", "command": "printf TOOL_FINISHED"}]))
-            pid, master = pty.fork()
-            if pid == 0:
-                os.execv(sys.executable, [sys.executable, str(Path(launcher.__file__).resolve()),
-                         "--picker", "--plain", "--cwd", directory, "--config", str(config)])
+            master, slave = pty.openpty()
+            # Establish the controlling terminal in a fresh interpreter; forkpty
+            # can deadlock after macOS libraries initialize process-global locks.
+            command = [sys.executable, str(Path(launcher.__file__).resolve()),
+                       "--picker", "--plain", "--cwd", directory, "--config", str(config)]
+            child = subprocess.Popen([sys.executable, "-c",
+                "import fcntl,termios,os,sys; fcntl.ioctl(0,termios.TIOCSCTTY,0); os.execv(sys.argv[1],sys.argv[1:])", *command],
+                stdin=slave, stdout=slave, stderr=slave, start_new_session=True)
+            os.close(slave)
             reaped = False
             try:
                 os.write(master, b"1\n")
@@ -255,8 +252,8 @@ class LauncherTests(unittest.TestCase):
                 self.assertEqual(output.count(b"Exit status: 0"), 2)
                 os.write(master, b"q\n")
                 while time.monotonic() < deadline:
-                    done, status = os.waitpid(pid, os.WNOHANG)
-                    if done:
+                    status = child.poll()
+                    if status is not None:
                         reaped = True
                         self.assertEqual(status, 0)
                         break
@@ -264,8 +261,8 @@ class LauncherTests(unittest.TestCase):
                 self.assertTrue(reaped, "Picker did not close")
             finally:
                 if not reaped:
-                    os.kill(pid, signal.SIGKILL)
-                    os.waitpid(pid, 0)
+                    child.kill()
+                    child.wait(timeout=5)
                 os.close(master)
 
 

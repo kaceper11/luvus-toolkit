@@ -370,7 +370,7 @@ def orch_action(store, host, record, reviewed, action):
 
 
 def session_key():
-    home = str(Path(os.environ.get("LUVUS_HOME", Path.home() / ".luvus")).resolve())
+    home = str(Path((os.environ.get("LUVUS_HOME") or Path.home() / ".luvus")).resolve())
     session = os.environ.get("LUVUS_SESSION", "default")
     # The inherited socket is authoritative. Default home callers use the same canonical identity.
     socket = os.environ.get("LUVUS_SOCKET_PATH", "")
