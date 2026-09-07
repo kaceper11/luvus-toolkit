@@ -414,6 +414,7 @@ class ConsoleTests(unittest.IsolatedAsyncioTestCase):
             self.app.query_one("#tabs", TabbedContent).active = "handovers"
             await pilot.pause()
             await pilot.click("#edit")
+            await wait_until(pilot, lambda: bool(self.app.screen.query("#target-branch")))
             self.app.screen.query_one("#target-branch", Input).value = "feature/recovered"
             await pilot.pause()
             await pilot.click("#editor-close")

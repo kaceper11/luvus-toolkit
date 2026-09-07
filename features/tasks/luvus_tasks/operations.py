@@ -374,7 +374,7 @@ def session_key():
     session = os.environ.get("LUVUS_SESSION", "default")
     # The inherited socket is authoritative. Default home callers use the same canonical identity.
     socket = os.environ.get("LUVUS_SOCKET_PATH", "")
-    if socket and os.name != "nt":
+    if socket and not socket.lower().startswith("\\\\.\\pipe\\"):
         socket = str(Path(socket).resolve())
     if socket == str(Path(home) / "luvus.sock"):
         socket = ""
