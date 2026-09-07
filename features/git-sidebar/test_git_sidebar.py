@@ -369,7 +369,7 @@ def branch_checks():
         app.git(repo, "add", ".")
         app.git(repo, "commit", "-m", "Advance base")
         app.git(repo, "checkout", "feature")
-        unusual = "--雪\tline\nbreak.txt"
+        unusual = "--雪 line-break.txt" if os.name == "nt" else "--雪\tline\nbreak.txt"
         app.git(repo, "mv", "--", "old.txt", unusual)
         (repo / "delete.txt").unlink()
         (repo / "binary.dat").write_bytes(b"\0binary\xff")

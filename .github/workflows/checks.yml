@@ -43,5 +43,9 @@ jobs:
           Expand-Archive "$env:RUNNER_TEMP/luvus.zip" "$env:RUNNER_TEMP/luvus"
           $luvusBinary = (Get-ChildItem "$env:RUNNER_TEMP/luvus" -Filter luvus.exe -Recurse | Select-Object -First 1).FullName
           "LUVUS_BIN_PATH=$luvusBinary" >> $env:GITHUB_ENV
+      - name: Native power lifetime
+        run: |
+          python toolkit.py bootstrap
+          node scripts/power-smoke.mjs
       - name: Fresh installation and native panes
         run: python -X utf8 scripts/smoke.py --install

@@ -13,10 +13,16 @@ with tempfile.TemporaryDirectory(prefix='ltk-',dir='/tmp' if os.name != 'nt' els
     env.update(LUVUS_HOME=home,LUVUS_BIN_PATH=binary)
     if os.name != 'nt': env['LUVUS_SOCKET_PATH']=str(Path(home)/'luvus.sock')
     def cli(*args):
-        p=subprocess.run([binary,*args],env=env,capture_output=True,text=True,timeout=180)
-        if p.returncode:raise AssertionError(p.stdout+p.stderr)
-        try:result=json.loads(p.stdout)
-        except ValueError:return p.stdout
+        print('Native:', ' '.join(args), flush=True)
+        # A daemon may inherit CLI handles. Files avoid waiting for pipe EOF
+        # after the command process exits, especially on Windows.
+        with tempfile.TemporaryFile(mode='w+',encoding='utf8') as output, tempfile.TemporaryFile(mode='w+',encoding='utf8') as errors:
+            p=subprocess.run([binary,*args],env=env,stdout=output,stderr=errors,timeout=180)
+            output.seek(0); stdout=output.read()
+            errors.seek(0); stderr=errors.read()
+        if p.returncode:raise AssertionError(stdout+stderr)
+        try:result=json.loads(stdout)
+        except ValueError:return stdout
         if 'error' in result:raise AssertionError(result['error'])
         return result.get('result',result)
     try:

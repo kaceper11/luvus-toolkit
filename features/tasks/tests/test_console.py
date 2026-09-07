@@ -444,6 +444,7 @@ class ConsoleTests(unittest.IsolatedAsyncioTestCase):
                 await pilot.pause()
                 await pilot.click("#edit")
                 await pilot.pause()
+                await wait_until(pilot, lambda: bool(self.app.query("#editor-sections")))
                 self.app.query_one("#editor-sections", TabbedContent).active = "editor-prompt"
                 self.app.query_one("#prompt-preset", Select).value = "Review"
                 await pilot.pause()

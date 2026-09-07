@@ -24,7 +24,8 @@ test('power assertions have a bounded native implementation', () => {
     const code=Buffer.from(args.at(-1),'base64').toString('utf16le');
     assert.match(code,/Thread.Sleep\(30000\)/);
     assert.match(code,/finally/);
-  } else assert.deepEqual(args,['-i','-t','30']);
+  } else if(process.platform==='win32') {assert.match(args[0],/power_windows.py$/);assert.equal(args[1],'hold');}
+  else assert.deepEqual(args,['-i','-t','30']);
 });
 
 test('npm shim resolution preserves argument bytes and rejects arbitrary batch files', async () => {

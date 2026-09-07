@@ -1,3 +1,5 @@
+import { python, root } from './runtime.mjs';
+import { join } from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 const exec = promisify(execFile);
@@ -23,6 +25,7 @@ function powershell(body) {
   return ['powershell.exe', ['-NoProfile','-NonInteractive','-EncodedCommand',Buffer.from(script,'utf16le').toString('base64')]];
 }
 export function assertionCommand() {
+  if (process.platform === 'win32') return [python,[join(root,'toolkit_core/power_windows.py'),'hold']];
   if (windows) return powershell('[ToolkitPower]::Hold()');
   if (process.platform === 'darwin') return ['/usr/bin/caffeinate',['-i','-t','30']];
   throw new Error('Keep Awake currently supports macOS, Windows and WSL2');
@@ -32,7 +35,7 @@ export async function powerStatus(macParser, run) {
     if (process.platform !== 'darwin') throw new Error('Unsupported power management platform');
     return macParser(await run('/usr/bin/pmset',['-g','batt']));
   }
-  const [file,args] = powershell(`$status = New-Object ToolkitPower+Status
+  const [file,args] = process.platform === 'win32' ? [python,[join(root,'toolkit_core/power_windows.py'),'status']] : powershell(`$status = New-Object ToolkitPower+Status
 if (-not [ToolkitPower]::GetSystemPowerStatus([ref]$status)) { throw 'Power status unavailable' }
 @{ac=[int]$status.AC;flag=[int]$status.Flag;percent=[int]$status.Percent} | ConvertTo-Json -Compress`);
   const {stdout} = await exec(file,args,{timeout:10000,maxBuffer:4096});
