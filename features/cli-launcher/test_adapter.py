@@ -23,6 +23,15 @@ class AdapterTests(unittest.TestCase):
         self.run = {"id": "run", "root": self.cwd, "definition": self.definition,
                     "session": self.session, "state": "running", "readiness": "ready", "updated": time.time()}
 
+    def test_installed_connections_use_bundle_dispatcher(self):
+        from toolkit_core import ROOT
+        for owner, feature in (("tasks", "tasks"), ("commands", "project-commands")):
+            def rpc(method, **params):
+                return {"enabled": True, "runnable": True, "root": str(ROOT / "features" / feature)} if method == "module.info" else {"dir": self.cwd}
+            command = project.installed_provider(owner, rpc)
+            offset = command.index(str(ROOT / "toolkit.py"))
+            self.assertEqual(command[offset + 1:offset + 4], ["run", feature, "launcher.py"])
+
     def owner(self, entrypoint, cwd, action, **params):
         self.assertEqual(cwd, self.cwd)
         self.calls.append((action, params))

@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
+import { writeExecutable } from '../../../tests/fixture.mjs';
 import assert from 'node:assert/strict';
 import { mkdtemp, writeFile, readFile, rm, mkdir, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -138,7 +139,7 @@ test('Claude removal never overwrites a subsequently changed status line', async
 });
 test('OpenCode empty stdout is a valid empty session list', async t => {
   const dir = await temporary(t), file = join(dir, 'opencode');
-  await writeFile(file, '#!/bin/sh\nexit 0\n', { mode: 0o700 });
+  await writeExecutable(file, '#!/usr/bin/env node\nprocess.exit(0);', { mode: 0o700 });
   const s = await collectOpenCode(settings({ 'opencode-executable': file }));
   assert.equal(s.sessions.length, 0); assert(!s.error);
 });

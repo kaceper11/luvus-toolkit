@@ -122,7 +122,7 @@ class ProjectTests(unittest.TestCase):
             project.destination(str(script), self.cwd)
         doc = Path(self.cwd) / "quotes $ ` ✓.md"
         doc.write_text("doc")
-        self.assertEqual(project.destination(doc.name, self.cwd), doc.as_uri())
+        self.assertEqual(project.destination(doc.name, self.cwd), doc.resolve().as_uri())
         link = self.config["repositories"][self.cwd]["links"]["docs"]
         opened = []
         project.open_link(self.path, self.identity, "docs", link, opener=opened.append)

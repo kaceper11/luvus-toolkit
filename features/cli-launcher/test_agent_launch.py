@@ -115,7 +115,7 @@ class AgentLaunchTests(unittest.TestCase):
         folder.mkdir()
         plan = agent.prepare(str(folder), "current")
         agent.execute(self.config, plan, self.preset, "folder", self.rpc)
-        self.assertEqual(next(p for m, p in reversed(self.calls) if m == "terminal.backend.create")["cwd"], str(folder))
+        self.assertEqual(next(p for m, p in reversed(self.calls) if m == "terminal.backend.create")["cwd"], project.canonical(folder))
         rendered = launcher.render_manifest([*launcher.DEFAULTS, self.preset])
         self.assertEqual(rendered.count('contexts = ["pane", "workspace", "agent"]'), 6)
         self.assertIn("Open Codex — skip permissions", rendered)

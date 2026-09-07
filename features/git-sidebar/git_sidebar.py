@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Luvus dock and short-lived Git operation pane. Python 3.9+, no packages."""
 import contextlib
+import psutil
 from toolkit_core import locks
 import hashlib
 import json
@@ -377,12 +378,8 @@ def read_progress(scope):
     except (FileNotFoundError, ValueError):
         return None
     if data["state"] == "working":
-        try:
-            os.kill(data["pid"], 0)
-        except ProcessLookupError:
+        if not psutil.pid_exists(data["pid"]):
             data.update(text="Action ended; check Git status", state="blocked")
-        except PermissionError:
-            pass
     return data
 
 

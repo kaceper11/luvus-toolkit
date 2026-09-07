@@ -203,7 +203,7 @@ def run():
             with patch.object(app, "PROGRESS_SCOPE", app.root(repo)), patch.object(app, "refresh"):
                 app.progress("Loading diff…")
                 assert app.read_progress(app.root(repo))["state"] == "working"
-                with patch.object(app.os, "kill", side_effect=ProcessLookupError):
+                with patch.object(app.psutil, "pid_exists", return_value=False):
                     assert app.read_progress(app.root(repo))["state"] == "blocked"
                 app.progress("Diff opened", "done")
                 assert app.read_progress(app.root(repo))["text"] == "Diff opened"

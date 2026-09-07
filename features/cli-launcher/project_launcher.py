@@ -270,9 +270,9 @@ def installed_provider(owner, rpc=launcher.call):
         raise ValueError("The installed module's interpreter or entrypoint is missing.")
     directory = rpc("module.config_dir", id=module)["dir"]
     if owner == "tasks":
-        return [str(python), str(script), "bundle-api", directory]
+        return [str(python), str(toolkit_root / "toolkit.py"), "run", "tasks", "launcher.py", "bundle-api", directory]
     return [sys.executable, str(Path(__file__).with_name("commands_adapter.py").resolve()),
-            str(python), str(script), "api", "--store", directory]
+            str(python), str(toolkit_root / "toolkit.py"), "run", "project-commands", "launcher.py", "api", "--store", directory]
 
 
 def check_provider(config, owner, cwd):
