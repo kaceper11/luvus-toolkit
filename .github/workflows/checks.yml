@@ -22,3 +22,5 @@ jobs:
       - run: python toolkit.py test
       - run: npm test
         if: success() || failure()
+      - run: node scripts/power-smoke.mjs
+        if: (success() || failure()) && runner.os != 'Linux'
