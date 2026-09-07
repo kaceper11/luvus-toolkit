@@ -19,8 +19,9 @@ jobs:
       - name: Validate inside WSL2
         shell: pwsh
         run: |
-          $script = (wsl -d Ubuntu-24.04 -u root -- wslpath "$env:GITHUB_WORKSPACE/scripts/wsl-smoke.sh").Trim()
-          wsl -d Ubuntu-24.04 -u root -- bash $script "$env:GITHUB_SHA"
+          $source = "$env:GITHUB_WORKSPACE/scripts/wsl-smoke.sh".Replace('\', '/')
+          $script = (wsl -d Ubuntu-24.04 -u root --exec wslpath $source).Trim()
+          wsl -d Ubuntu-24.04 -u root --exec bash $script "$env:GITHUB_SHA"
           if ($LASTEXITCODE -ne 0) { throw 'WSL2 validation failed' }
       - name: Stop disposable distribution
         if: always()
