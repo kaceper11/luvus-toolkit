@@ -219,6 +219,14 @@ class LauncherTests(unittest.TestCase):
 
     @unittest.skipIf(os.name == "nt", "POSIX controlling-terminal regression")
     def test_picker_keeps_controlling_terminal_after_tool_exit(self):
+        # forkpty must run in a fresh interpreter on macOS, before other tests
+        # initialize libraries with process-global locks.
+        if not os.environ.get("TOOLKIT_PTY_TEST_CHILD"):
+            result = subprocess.run([sys.executable, "-m", "unittest", self.id()],
+                                    env={**os.environ, "TOOLKIT_PTY_TEST_CHILD": "1"},
+                                    capture_output=True, text=True, timeout=25)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            return
         import pty
         import select
         import signal

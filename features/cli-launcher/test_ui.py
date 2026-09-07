@@ -307,7 +307,7 @@ class AgentWizardTests(unittest.IsolatedAsyncioTestCase):
             await pilot.click("#open")
             await pilot.pause()
             for _ in range(100):
-                if self.app.screen.query("#mode"): break
+                if self.app.screen.query("#mode") and self.app.screen.query_one("#mode", Select).value is not Select.NULL: break
                 await pilot.pause(0.05)
             self.assertEqual(self.app.screen.query_one("#mode", Select).value, "new")
             await pilot.press("ctrl+s")
