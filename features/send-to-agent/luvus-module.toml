@@ -1,0 +1,43 @@
+id = "personal.luvus-send-to-agent"
+name = "Send to agent"
+version = "0.2.0"
+min_luvus_version = "0.13.4"
+description = "Send selected text, file changes, or code lines to an existing or new agent"
+
+[[actions]]
+id = "open"
+title = "Send to agent…"
+contexts = ["pane", "agent", "workspace"]
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "open"]
+
+[[actions]]
+id = "open-windows"
+title = "Send to agent…"
+contexts = ["pane", "agent", "workspace"]
+platforms = ["windows"]
+command = ["python", "launcher.py", "open"]
+
+[[panes]]
+id = "composer"
+title = "Send to agent"
+placement = "tab"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "ui"]
+
+[[panes]]
+id = "composer-windows"
+title = "Send to agent"
+placement = "tab"
+platforms = ["windows"]
+command = ["python", "launcher.py", "ui"]
+
+[[events]]
+on = "pane.focused"
+platforms = ["macos", "linux"]
+command = ["python3", "tab_titles.py"]
+
+[[events]]
+on = "pane.focused"
+platforms = ["windows"]
+command = ["python", "tab_titles.py"]

@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "luvus-tasks"
+version = "0.8.1"
+description = "Jira, Azure DevOps, and GitHub Issues with reviewed agent handovers for Luvus"
+requires-python = ">=3.11"
+dependencies = ["keyring>=25,<26", "textual==8.2.8"]
+
+[project.scripts]
+luvus-tasks = "luvus_tasks.ui:main"
+
+[tool.setuptools.packages.find]
+include = ["luvus_tasks*"]

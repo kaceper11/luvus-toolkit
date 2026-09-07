@@ -1,0 +1,81 @@
+id = "personal.luvus-cli-launcher"
+name = "CLI Launcher"
+version = "0.6.0"
+min_luvus_version = "0.13.4"
+description = "Open saved CLI tools directly from the right-click menu."
+
+[[actions]]
+id = "open-b85ac5c9d24be854"
+title = "Open Codex — skip permissions"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "--action", "run", "--preset", "{\"command\": \"codex --dangerously-bypass-approvals-and-sandbox\", \"name\": \"codex\"}"]
+contexts = ["pane", "workspace", "agent"]
+
+[[actions]]
+id = "open-718821ca35e48ded"
+title = "Open Muse — YOLO"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "--action", "run", "--preset", "{\"command\": \"muse --yolo\", \"name\": \"Muse\"}"]
+contexts = ["pane", "workspace", "agent"]
+
+[[actions]]
+id = "project"
+title = "Agent Launcher…"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "--open"]
+contexts = ["pane", "workspace", "agent"]
+
+[[actions]]
+id = "launch"
+title = "Manage saved tools…"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "--open"]
+
+[[actions]]
+id = "refresh"
+title = "Refresh tool menu"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "--action", "refresh"]
+
+[[actions]]
+id = "open-b85ac5c9d24be854-windows"
+title = "Open Codex — skip permissions"
+platforms = ["windows"]
+command = ["python", "launcher.py", "--action", "run", "--preset", "{\"command\": \"codex --dangerously-bypass-approvals-and-sandbox\", \"name\": \"codex\"}"]
+contexts = ["pane", "workspace", "agent"]
+
+[[actions]]
+id = "open-718821ca35e48ded-windows"
+title = "Open Muse — YOLO"
+platforms = ["windows"]
+command = ["python", "launcher.py", "--action", "run", "--preset", "{\"command\": \"muse --yolo\", \"name\": \"Muse\"}"]
+contexts = ["pane", "workspace", "agent"]
+
+[[actions]]
+id = "project-windows"
+title = "Agent Launcher…"
+platforms = ["windows"]
+command = ["python", "launcher.py", "--open"]
+contexts = ["pane", "workspace", "agent"]
+
+[[actions]]
+id = "launch-windows"
+title = "Manage saved tools…"
+platforms = ["windows"]
+command = ["python", "launcher.py", "--open"]
+
+[[actions]]
+id = "refresh-windows"
+title = "Refresh tool menu"
+platforms = ["windows"]
+command = ["python", "launcher.py", "--action", "refresh"]
+
+[[events]]
+on = "pane.focused"
+platforms = ["macos", "linux"]
+command = ["python3", "tab_titles.py"]
+
+[[events]]
+on = "pane.focused"
+platforms = ["windows"]
+command = ["python", "tab_titles.py"]

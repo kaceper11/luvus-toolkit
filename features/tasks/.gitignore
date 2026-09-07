@@ -1,0 +1,10 @@
+.venv/
+.bootstrap/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.env
+.DS_Store
+.codebase-memory/

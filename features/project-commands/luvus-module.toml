@@ -1,0 +1,43 @@
+id = "personal.project-commands"
+name = "Project Commands"
+version = "0.1.3"
+min_luvus_version = "0.13.4"
+description = "Project commands, validation, services, health, problems and resources"
+
+[[actions]]
+id = "open"
+title = "Project Commands…"
+contexts = ["workspace", "pane", "agent"]
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "open"]
+
+[[actions]]
+id = "open-windows"
+title = "Project Commands…"
+contexts = ["workspace", "pane", "agent"]
+platforms = ["windows"]
+command = ["python", "launcher.py", "open"]
+
+[[panes]]
+id = "commands"
+title = "Project Commands"
+placement = "tab"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "ui"]
+
+[[panes]]
+id = "commands-windows"
+title = "Project Commands"
+placement = "tab"
+platforms = ["windows"]
+command = ["python", "launcher.py", "ui"]
+
+[[events]]
+on = "pane.focused"
+platforms = ["macos", "linux"]
+command = ["python3", "project_commands/tab_titles.py"]
+
+[[events]]
+on = "pane.focused"
+platforms = ["windows"]
+command = ["python", "project_commands/tab_titles.py"]

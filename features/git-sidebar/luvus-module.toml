@@ -1,0 +1,199 @@
+id = "personal.git-sidebar"
+name = "Git Sidebar"
+version = "0.8.0"
+min_luvus_version = "0.13.4"
+description = "Clickable Git actions with reviewed Codex commit messages and Lazygit"
+platforms = ["macos", "linux"]
+
+[[docks]]
+id = "git-sidebar"
+title = "Git"
+placement = "sidebar.right"
+
+[[startup]]
+command = ["python3", "git_sidebar.py", "start-watch"]
+
+[[events]]
+on = "pane.focused"
+command = ["python3", "git_sidebar.py", "refresh"]
+
+[[events]]
+on = "pane.agent_status_changed"
+command = ["python3", "git_sidebar.py", "refresh"]
+
+[[events]]
+on = "workspace.created"
+command = ["python3", "git_sidebar.py", "refresh"]
+
+[[events]]
+on = "workspace.closed"
+command = ["python3", "git_sidebar.py", "refresh"]
+
+[[actions]]
+id = "refresh"
+title = "Refresh Git sidebar"
+command = ["python3", "git_sidebar.py", "refresh"]
+
+[[actions]]
+id = "stage"
+title = "Stage file"
+command = ["python3", "git_sidebar.py", "stage"]
+
+[[actions]]
+id = "unstage"
+title = "Unstage file"
+command = ["python3", "git_sidebar.py", "unstage"]
+
+[[actions]]
+id = "stage-all"
+title = "Stage all changes"
+command = ["python3", "git_sidebar.py", "stage-all"]
+
+[[actions]]
+id = "generate"
+title = "Generate commit message"
+command = ["python3", "git_sidebar.py", "generate"]
+
+[[actions]]
+id = "commit"
+title = "Commit staged changes"
+command = ["python3", "git_sidebar.py", "commit"]
+
+[[actions]]
+id = "pull"
+title = "Pull upstream changes"
+command = ["python3", "git_sidebar.py", "pull"]
+
+[[actions]]
+id = "push"
+title = "Push current branch"
+command = ["python3", "git_sidebar.py", "push"]
+
+[[actions]]
+id = "merge"
+title = "Fetch and merge another branch"
+command = ["python3", "git_sidebar.py", "merge"]
+
+[[actions]]
+id = "lazygit"
+title = "Open Lazygit"
+command = ["python3", "git_sidebar.py", "lazygit"]
+
+[[panes]]
+id = "git-terminal"
+title = "Git"
+placement = "split"
+command = ["python3", "git_sidebar.py", "terminal"]
+
+[[actions]]
+id = "preview"
+title = "Preview file changes"
+command = ["python3", "git_sidebar.py", "preview"]
+
+[[actions]]
+id = "more"
+title = "More Git actions"
+command = ["python3", "git_sidebar.py", "more"]
+
+[[actions]]
+id = "toggle"
+title = "Expand or collapse files"
+command = ["python3", "git_sidebar.py", "toggle"]
+
+[[actions]]
+id = "page"
+title = "Change file page"
+command = ["python3", "git_sidebar.py", "page"]
+
+[[bars]]
+id = "git-actions"
+title = "Git actions"
+region = "top-right"
+priority = 50
+
+[[actions]]
+id = "open-repository"
+title = "Open repository…"
+command = ["python3", "git_sidebar.py", "open-repository"]
+
+[[actions]]
+id = "text-preview"
+title = "Text preview (fallback)"
+command = ["python3", "git_sidebar.py", "text-preview"]
+
+[[actions]]
+id = "repository-path"
+title = "Enter repository path"
+command = ["python3", "git_sidebar.py", "repository-path"]
+
+[[actions]]
+id = "select-repository"
+title = "Open selected repository"
+command = ["python3", "git_sidebar.py", "select-repository"]
+
+[[actions]]
+id = "repository-page"
+title = "More repositories"
+command = ["python3", "git_sidebar.py", "repository-page"]
+
+[[actions]]
+id = "close-picker"
+title = "Back to Git"
+command = ["python3", "git_sidebar.py", "close-picker"]
+
+[[actions]]
+id = "clear-progress"
+title = "Dismiss Git status"
+command = ["python3", "git_sidebar.py", "clear-progress"]
+
+[[panes]]
+id = "lazygit-terminal"
+title = "Lazygit"
+placement = "tab"
+command = ["python3", "git_sidebar.py", "terminal"]
+
+[[actions]]
+id = "review-changes"
+title = "Review changes"
+command = ["python3", "git_sidebar.py", "review-changes"]
+
+[[actions]]
+id = "review-branch"
+title = "Review branch…"
+command = ["python3", "git_sidebar.py", "review-branch"]
+
+[[actions]]
+id = "hub"
+title = "Git…"
+contexts = ["workspace"]
+command = ["python3", "git_sidebar.py", "hub"]
+
+[[events]]
+on = "pane.focused"
+platforms = ["macos", "linux"]
+command = ["python3", "tab_titles.py"]
+
+[[actions]]
+id = "lazygit-status"
+title = "Changes"
+command = ["python3", "git_sidebar.py", "lazygit-status"]
+
+[[actions]]
+id = "lazygit-branch"
+title = "Branches"
+command = ["python3", "git_sidebar.py", "lazygit-branch"]
+
+[[actions]]
+id = "lazygit-log"
+title = "Commits"
+command = ["python3", "git_sidebar.py", "lazygit-log"]
+
+[[actions]]
+id = "lazygit-stash"
+title = "Stashes"
+command = ["python3", "git_sidebar.py", "lazygit-stash"]
+
+[[actions]]
+id = "close-hub"
+title = "Back"
+command = ["python3", "git_sidebar.py", "close-hub"]

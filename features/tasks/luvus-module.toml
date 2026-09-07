@@ -1,0 +1,344 @@
+id = "personal.luvus-tasks"
+name = "Luvus Tasks"
+version = "0.8.1"
+min_luvus_version = "0.13.4"
+description = "Jira, Azure DevOps, and GitHub Issues with reviewed agent handovers"
+
+[[actions]]
+id = "copy-selection"
+title = "Tasks: Copy selected text"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "copy-selection"]
+
+[[actions]]
+id = "copy-selection-windows"
+title = "Tasks: Copy selected text"
+platforms = ["windows"]
+command = ["python", "launcher.py", "copy-selection"]
+
+[[bars]]
+id = "task-status"
+title = "Tasks"
+region = "bottom-right"
+priority = 40
+
+[[actions]]
+id = "handover"
+title = "Tasks: Prepare handover"
+platforms = ["macos","linux"]
+command = ["python3", "launcher.py", "handover"]
+
+[[actions]]
+id = "handover-windows"
+title = "Tasks: Prepare handover"
+platforms = ["windows"]
+command = ["python", "launcher.py", "handover"]
+
+[[actions]]
+id = "status"
+title = "Tasks: Change status"
+platforms = ["macos","linux"]
+command = ["python3", "launcher.py", "status"]
+
+[[actions]]
+id = "status-windows"
+title = "Tasks: Change status"
+platforms = ["windows"]
+command = ["python", "launcher.py", "status"]
+
+[[actions]]
+id = "browser"
+title = "Tasks: Open issue in browser"
+platforms = ["macos","linux"]
+command = ["python3", "launcher.py", "browser"]
+
+[[actions]]
+id = "browser-windows"
+title = "Tasks: Open issue in browser"
+platforms = ["windows"]
+command = ["python", "launcher.py", "browser"]
+
+[[actions]]
+id = "actions"
+title = "Tasks: Issue actions"
+platforms = ["macos","linux"]
+command = ["python3", "launcher.py", "actions"]
+
+[[actions]]
+id = "actions-windows"
+title = "Tasks: Issue actions"
+platforms = ["windows"]
+command = ["python", "launcher.py", "actions"]
+
+[[actions]]
+id = "selection"
+title = "Tasks: Add selected text to draft"
+platforms = ["macos","linux"]
+command = ["python3", "launcher.py", "selection"]
+
+[[actions]]
+id = "selection-windows"
+title = "Tasks: Add selected text to draft"
+platforms = ["windows"]
+command = ["python", "launcher.py", "selection"]
+
+[[actions]]
+id = "linked"
+title = "Tasks: Open linked handover"
+platforms = ["macos","linux"]
+command = ["python3", "launcher.py", "linked"]
+
+[[actions]]
+id = "linked-windows"
+title = "Tasks: Open linked handover"
+platforms = ["windows"]
+command = ["python", "launcher.py", "linked"]
+
+[[actions]]
+id = "follow-up"
+title = "Tasks: Prepare follow-up"
+platforms = ["macos","linux"]
+command = ["python3", "launcher.py", "follow-up"]
+
+[[actions]]
+id = "follow-up-windows"
+title = "Tasks: Prepare follow-up"
+platforms = ["windows"]
+command = ["python", "launcher.py", "follow-up"]
+
+[[actions]]
+id = "workspace-handover"
+title = "Handover / continue in this worktree"
+platforms = ["macos","linux"]
+command = ["python3", "launcher.py", "workspace-handover"]
+
+[[actions]]
+id = "workspace-handover-windows"
+title = "Handover / continue in this worktree"
+platforms = ["windows"]
+command = ["python", "launcher.py", "workspace-handover"]
+
+
+[[docks]]
+id = "luvus-tasks"
+title = "Tasks"
+placement = "sidebar.right"
+
+[[startup]]
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "watch"]
+
+[[startup]]
+platforms = ["windows"]
+command = ["python", "launcher.py", "watch"]
+
+[[actions]]
+id = "open"
+title = "Open Tasks"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "open"]
+
+[[actions]]
+id = "open-windows"
+title = "Open Tasks"
+platforms = ["windows"]
+command = ["python", "launcher.py", "open"]
+
+[[actions]]
+id = "refresh"
+title = "Refresh Tasks"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "refresh"]
+
+[[actions]]
+id = "refresh-windows"
+title = "Refresh Tasks"
+platforms = ["windows"]
+command = ["python", "launcher.py", "refresh"]
+
+[[panes]]
+id = "tasks"
+title = "Tasks"
+placement = "tab"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "ui"]
+
+[[actions]]
+id = "scope"
+title = "Tasks: Change sidebar scope"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "scope"]
+
+[[actions]]
+id = "scope-windows"
+title = "Tasks: Change sidebar scope"
+platforms = ["windows"]
+command = ["python", "launcher.py", "scope"]
+
+[[panes]]
+id = "tasks-windows"
+title = "Tasks"
+placement = "tab"
+platforms = ["windows"]
+command = ["python", "launcher.py", "ui"]
+
+[[events]]
+on = "pane.agent_status_changed"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "dock"]
+
+[[events]]
+on = "pane.agent_status_changed"
+platforms = ["windows"]
+command = ["python", "launcher.py", "dock"]
+
+[[actions]]
+id = "attention"
+title = "Tasks: All-workspace attention"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "attention"]
+
+[[actions]]
+id = "attention-windows"
+title = "Tasks: All-workspace attention"
+platforms = ["windows"]
+command = ["python", "launcher.py", "attention"]
+
+[[actions]]
+id = "find-work"
+title = "Tasks: Find work"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "find-work"]
+
+[[actions]]
+id = "find-work-windows"
+title = "Tasks: Find work"
+platforms = ["windows"]
+command = ["python", "launcher.py", "find-work"]
+
+[[events]]
+on = "pane.closed"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "dock"]
+
+[[events]]
+on = "pane.closed"
+platforms = ["windows"]
+command = ["python", "launcher.py", "dock"]
+
+[[events]]
+on = "pane.moved"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "dock"]
+
+[[events]]
+on = "pane.moved"
+platforms = ["windows"]
+command = ["python", "launcher.py", "dock"]
+
+[[events]]
+on = "workspace.closed"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "dock"]
+
+[[events]]
+on = "workspace.closed"
+platforms = ["windows"]
+command = ["python", "launcher.py", "dock"]
+
+[[events]]
+on = "task.updated"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "dock"]
+
+[[events]]
+on = "task.updated"
+platforms = ["windows"]
+command = ["python", "launcher.py", "dock"]
+
+[[events]]
+on = "task.done"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "dock"]
+
+[[events]]
+on = "task.done"
+platforms = ["windows"]
+command = ["python", "launcher.py", "dock"]
+
+[[events]]
+on = "task.gate_failed"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "dock"]
+
+[[events]]
+on = "task.gate_failed"
+platforms = ["windows"]
+command = ["python", "launcher.py", "dock"]
+
+[[events]]
+on = "task.gate_passed"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "dock"]
+
+[[events]]
+on = "task.gate_passed"
+platforms = ["windows"]
+command = ["python", "launcher.py", "dock"]
+
+[[events]]
+on = "lease.acquired"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "dock"]
+
+[[events]]
+on = "lease.acquired"
+platforms = ["windows"]
+command = ["python", "launcher.py", "dock"]
+
+[[events]]
+on = "lease.released"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "dock"]
+
+[[events]]
+on = "lease.released"
+platforms = ["windows"]
+command = ["python", "launcher.py", "dock"]
+
+[[actions]]
+id = "capture"
+title = "Tasks: Capture selected text as task"
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "capture"]
+
+[[actions]]
+id = "capture-windows"
+title = "Tasks: Capture selected text as task"
+platforms = ["windows"]
+command = ["python", "launcher.py", "capture"]
+
+[[actions]]
+id = "hub"
+title = "Tasks"
+contexts = ["workspace", "pane", "agent"]
+platforms = ["macos", "linux"]
+command = ["python3", "launcher.py", "hub"]
+
+[[actions]]
+id = "hub-windows"
+title = "Tasks"
+contexts = ["workspace", "pane", "agent"]
+platforms = ["windows"]
+command = ["python", "launcher.py", "hub"]
+
+
+[[events]]
+on = "pane.focused"
+platforms = ["macos", "linux"]
+command = ["python3", "luvus_tasks/tab_titles.py"]
+
+[[events]]
+on = "pane.focused"
+platforms = ["windows"]
+command = ["python", "luvus_tasks/tab_titles.py"]

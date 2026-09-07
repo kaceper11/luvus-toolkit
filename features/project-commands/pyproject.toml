@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "luvus-project-commands"
+version = "0.1.3"
+description = "Reviewed project commands, services and diagnostics for Luvus"
+requires-python = ">=3.11"
+dependencies = ["textual==8.2.8", "psutil>=7,<8"]
+
+[tool.setuptools.packages.find]
+include = ["project_commands*"]

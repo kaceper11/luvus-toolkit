@@ -1,0 +1,271 @@
+id = "kacper.ai-usage"
+name = "AI Usage"
+version = "0.1.0"
+min_luvus_version = "0.13.4"
+description = "Agent quotas, reset countdowns and local usage statistics"
+platforms = ["macos"]
+
+[[build]]
+command = ["npm","ci","--ignore-scripts","--omit=dev","--no-audit","--no-fund"]
+
+[[startup]]
+command = ["node","cli.mjs","start"]
+
+[[events]]
+on = "pane.agent_status_changed"
+command = ["node","cli.mjs","event"]
+
+[[events]]
+on = "agent.hook"
+command = ["node","cli.mjs","event"]
+
+[[actions]]
+id = "details"
+title = "Usage details"
+command = ["node","cli.mjs","details"]
+
+[[actions]]
+id = "refresh"
+title = "Refresh usage"
+command = ["node","cli.mjs","refresh"]
+
+[[actions]]
+id = "claude-connect"
+title = "Connect Claude status line"
+command = ["node","cli.mjs","claude-connect"]
+
+[[actions]]
+id = "claude-disconnect"
+title = "Restore previous Claude status line"
+command = ["node","cli.mjs","claude-disconnect"]
+
+[[actions]]
+id = "uninstall"
+title = "Remove AI Usage and restore Claude status line"
+command = ["node","cli.mjs","uninstall"]
+
+[[bars]]
+id = "codex"
+title = "Codex usage"
+region = "bottom-right"
+priority = 90
+
+[[panes]]
+id = "details-codex"
+title = "Codex usage"
+placement = "overlay"
+command = ["node","cli.mjs","overlay","codex"]
+
+[[settings]]
+key = "codex-enabled"
+title = "Show Codex"
+type = "bool"
+default = true
+
+[[settings]]
+key = "codex-executable"
+title = "Codex executable"
+type = "string"
+default = "codex"
+
+[[bars]]
+id = "claude"
+title = "Claude usage"
+region = "bottom-right"
+priority = 60
+
+[[panes]]
+id = "details-claude"
+title = "Claude usage"
+placement = "overlay"
+command = ["node","cli.mjs","overlay","claude"]
+
+[[settings]]
+key = "claude-enabled"
+title = "Show Claude"
+type = "bool"
+default = false
+
+[[settings]]
+key = "claude-executable"
+title = "Claude executable"
+type = "string"
+default = "claude"
+
+[[bars]]
+id = "opencode"
+title = "OpenCode usage"
+region = "bottom-right"
+priority = 60
+
+[[panes]]
+id = "details-opencode"
+title = "OpenCode usage"
+placement = "overlay"
+command = ["node","cli.mjs","overlay","opencode"]
+
+[[settings]]
+key = "opencode-enabled"
+title = "Show OpenCode"
+type = "bool"
+default = false
+
+[[settings]]
+key = "opencode-executable"
+title = "OpenCode executable"
+type = "string"
+default = "opencode"
+
+[[bars]]
+id = "muse"
+title = "Muse usage"
+region = "bottom-right"
+priority = 60
+
+[[panes]]
+id = "details-muse"
+title = "Muse usage"
+placement = "overlay"
+command = ["node","cli.mjs","overlay","muse"]
+
+[[settings]]
+key = "muse-enabled"
+title = "Show Muse"
+type = "bool"
+default = false
+
+[[settings]]
+key = "muse-executable"
+title = "Muse executable"
+type = "string"
+default = "muse"
+
+[[bars]]
+id = "copilot"
+title = "Copilot usage"
+region = "bottom-right"
+priority = 60
+
+[[panes]]
+id = "details-copilot"
+title = "Copilot usage"
+placement = "overlay"
+command = ["node","cli.mjs","overlay","copilot"]
+
+[[settings]]
+key = "copilot-enabled"
+title = "Show Copilot"
+type = "bool"
+default = false
+
+[[settings]]
+key = "copilot-executable"
+title = "Copilot executable"
+type = "string"
+default = "copilot"
+
+[[settings]]
+key = "display"
+title = "Quota display"
+type = "enum"
+default = "used"
+options = ["used","remaining"]
+
+[[settings]]
+key = "density"
+title = "Bar density"
+type = "enum"
+default = "standard"
+options = ["standard","compact"]
+
+[[settings]]
+key = "refresh-minutes"
+title = "Account refresh interval (minutes)"
+type = "number"
+default = 5
+min = 1
+max = 60
+step = 1
+
+[[settings]]
+key = "period-days"
+title = "Local sessions active in the last N days"
+type = "number"
+default = 7
+min = 1
+max = 365
+step = 1
+
+[[settings]]
+key = "warning-percent"
+title = "Warning at percent used"
+type = "number"
+default = 80
+min = 1
+max = 100
+step = 1
+
+[[settings]]
+key = "critical-percent"
+title = "Critical at percent used"
+type = "number"
+default = 95
+min = 1
+max = 100
+step = 1
+
+[[settings]]
+key = "notifications"
+title = "Notify when usage crosses a threshold"
+type = "bool"
+default = false
+
+[[settings]]
+key = "codex-priority"
+title = "Codex bar priority"
+type = "number"
+default = 90
+min = 0
+max = 100
+step = 5
+
+[[settings]]
+key = "claude-priority"
+title = "Claude bar priority"
+type = "number"
+default = 60
+min = 0
+max = 100
+step = 5
+
+[[settings]]
+key = "opencode-priority"
+title = "OpenCode bar priority"
+type = "number"
+default = 60
+min = 0
+max = 100
+step = 5
+
+[[settings]]
+key = "muse-priority"
+title = "Muse bar priority"
+type = "number"
+default = 60
+min = 0
+max = 100
+step = 5
+
+[[settings]]
+key = "copilot-priority"
+title = "Copilot bar priority"
+type = "number"
+default = 60
+min = 0
+max = 100
+step = 5
+
+[[events]]
+on = "pane.focused"
+platforms = ["macos", "linux"]
+command = ["python3", "tab_titles.py"]

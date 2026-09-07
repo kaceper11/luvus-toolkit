@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "luvus-toolkit"
+version = "0.1.0"
+description = "One Luvus module for tasks, Git, agents, commands, usage and power management"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = ["textual==8.2.8", "psutil==7.0.0", "keyring==25.7.0"]
+
+[tool.setuptools]
+packages = ["toolkit_core"]
