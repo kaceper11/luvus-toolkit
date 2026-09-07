@@ -14,6 +14,13 @@ import project_launcher as backend
 from launcher_ui import Form, LauncherApp
 
 
+async def wait_until(pilot, predicate):
+    for _ in range(100):
+        if predicate(): return
+        await pilot.pause(0.05)
+    raise AssertionError("UI did not reach the expected state")
+
+
 class DashboardTests(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix="launcher-ui-")
@@ -173,6 +180,7 @@ class DashboardTests(unittest.IsolatedAsyncioTestCase):
             worker = self.app.run_worker(self.app.message("Status", "Nothing launched."))
             await pilot.pause()
             self.assertEqual(len(self.app.screen.query("Button")), 1)
+            await wait_until(pilot, lambda: self.app.focused is not None and self.app.focused.id == "save")
             self.assertEqual(self.app.focused.id, "save")
             await pilot.press("enter")
             await worker.wait()
@@ -182,6 +190,7 @@ class DashboardTests(unittest.IsolatedAsyncioTestCase):
             with patch("project_launcher.installed_provider", return_value=["/fake/python", "owner.py"]):
                 self.app.perform("open")
                 await pilot.pause()
+            await wait_until(pilot, lambda: bool(self.app.screen.query("#arguments")))
             area = self.app.screen.query_one("#arguments", TextArea)
             area.focus()
             await pilot.pause()
@@ -306,9 +315,7 @@ class AgentWizardTests(unittest.IsolatedAsyncioTestCase):
             await self.ready(pilot)
             await pilot.click("#open")
             await pilot.pause()
-            for _ in range(100):
-                if self.app.screen.query("#mode") and self.app.screen.query_one("#mode", Select).value is not Select.NULL: break
-                await pilot.pause(0.05)
+            await wait_until(pilot, lambda: self.app.screen.query("#mode") and self.app.screen.query_one("#mode", Select).value is not Select.NULL)
             self.assertEqual(self.app.screen.query_one("#mode", Select).value, "new")
             await pilot.press("ctrl+s")
             await pilot.pause()
@@ -318,9 +325,7 @@ class AgentWizardTests(unittest.IsolatedAsyncioTestCase):
             self.value("destination", str(Path(self.cwd).parent / (Path(self.cwd).name + "-work")))
             await pilot.press("ctrl+s")
             await pilot.pause()
-            for _ in range(100):
-                if self.app.screen.query(".form-help") and "work/test" in str(self.app.screen.query_one(".form-help").render()): break
-                await pilot.pause(0.05)
+            await wait_until(pilot, lambda: self.app.screen.query(".form-help") and "work/test" in str(self.app.screen.query_one(".form-help").render()))
             self.assertIn("work/test", str(self.app.screen.query_one(".form-help").render()))
             self.assertFalse(self.presets.with_name("agent-launch.json").exists())
             await pilot.press("escape")
