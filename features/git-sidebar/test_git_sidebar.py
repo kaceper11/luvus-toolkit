@@ -44,7 +44,7 @@ def run():
         # Isolate tests from personal Git hooks, signing, templates and configuration.
         env = {"LUVUS_MODULE_STATE_DIR": str(folder / "state"), "LUVUS_SOCKET_PATH": "/test/socket"}
         with patch.dict(os.environ, env), patch.object(app, "active_workspace_path", side_effect=lambda: os.environ.get("LUVUS_WORKSPACE_CWD", str(repo))):
-            names = ["plain.txt", "two words.txt", "line\nbreak.txt", "雪.txt", "[abc].txt", "-flag.txt", "--option.txt", "$(touch nope).txt"]
+            names = ["plain.txt", "two words.txt", ("line-break.txt" if os.name == "nt" else "line\nbreak.txt"), "雪.txt", "[abc].txt", "-flag.txt", "--option.txt", "$(touch nope).txt"]
             for name in names:
                 (repo / name).write_text("one\n")
             assert {f["path"] for f in app.status(repo)} == set(names)

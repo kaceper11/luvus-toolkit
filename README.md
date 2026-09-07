@@ -39,7 +39,7 @@ npm test
 luvus module link /absolute/path/to/luvus-toolkit --disabled
 ```
 
-Use `python` on Windows. `toolkit.py` re-enters the shared `.venv` automatically. To run an isolated real-Luvus smoke test, set `LUVUS_BIN_PATH` to your installed binary and run `.venv/bin/python scripts/smoke.py` (Windows: `.venv\Scripts\python.exe`). The smoke test creates and stops its own disposable server.
+Use `python` on Windows. `toolkit.py` re-enters the shared `.venv` automatically. To run an isolated real-Luvus smoke test, set `LUVUS_BIN_PATH` to your installed binary and run `.venv/bin/python scripts/smoke.py` (Windows: `.venv\Scripts\python.exe`). The smoke test creates and stops its own disposable server. Run `node scripts/power-smoke.mjs` on macOS, native Windows and WSL2 to verify the native power helper exits after its parent; it briefly prevents idle sleep. Verify actual power requests on the host as well.
 
 Feature code lives in `features/`. `toolkit_core/` owns configuration paths, UI name translation, locks, tab titles and platform helpers. Feature manifests are input fragments; **only the root manifest is installed**. Add a feature directory and register its name in `toolkit_core.FEATURES`, then regenerate the root manifest. Keep feature behavior local and share only helpers with actual multiple callers.
 

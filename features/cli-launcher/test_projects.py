@@ -71,7 +71,7 @@ class ProjectTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix="project space ✓ ")
         self.addCleanup(self.temp.cleanup)
-        self.cwd = str(Path(self.temp.name).resolve())
+        self.cwd = project.canonical(self.temp.name)
         self.path = Path(self.cwd) / "config" / "projects.json"
         self.identity = project.identity(self.cwd)
         self.native = Native()

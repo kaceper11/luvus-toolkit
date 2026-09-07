@@ -56,7 +56,7 @@ export function decision(mode, count, power) {
 }
 
 // Only owned child handles are signaled. No stored PID is ever used to stop a process.
-export function assertion({ launch = spawn, now = () => performance.now() } = {}) {
+export function assertion({ launch = spawn, now = () => performance.now(), nativeCommand = assertionCommand } = {}) {
   let child = null, started = 0;
   const stop = () => { child?.kill('SIGTERM'); child = null; };
   return {
@@ -65,7 +65,7 @@ export function assertion({ launch = spawn, now = () => performance.now() } = {}
     async update(awake) {
       if (!awake) { stop(); return; }
       if (child && child.exitCode === null && child.signalCode === null && now() - started < 20000) return;
-      const [file, args] = assertionCommand();
+      const [file, args] = nativeCommand();
       const next = launch(file, args, { stdio: 'ignore' });
       // Keep an error listener after spawn too; process errors must not crash the helper.
       next.on('error', () => {});

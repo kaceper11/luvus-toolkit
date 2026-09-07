@@ -1,3 +1,4 @@
+import { executable } from './executable.mjs';
 // Native Luvus boundary for the two Node features; no binary/socket substitution.
 import { execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -10,7 +11,8 @@ export const python = join(root, '.venv', process.platform === 'win32' ? 'Script
 export const moduleId = 'kacper.toolkit';
 
 export async function native(ctx, args, options = {}) {
-  const { stdout } = await exec(ctx.binary, args, { timeout: 10000, maxBuffer: 1048576, ...options });
+  const [file, argv] = executable(ctx.binary, args);
+  const { stdout } = await exec(file, argv, { timeout: 10000, maxBuffer: 1048576, ...options });
   const data = JSON.parse(stdout);
   if (data.error) throw new Error(data.error.message ?? data.error.code);
   return data.result ?? data;
@@ -63,7 +65,8 @@ export async function sessionIdentity(ctx) {
 }
 export function rpc(ctx, method, params = {}) {
   return new Promise((resolve,reject) => {
-    const child=spawn(ctx.binary,['uhp','proxy'],{stdio:['pipe','pipe','pipe']});
+    const [file, argv] = executable(ctx.binary, ['uhp','proxy']);
+    const child=spawn(file,argv,{stdio:['pipe','pipe','pipe']});
     let output='',error='',finished=false;
     const done=(err,value)=>{if(finished)return;finished=true;clearTimeout(timer);err?reject(err):resolve(value);};
     const timer=setTimeout(()=>{child.kill();done(new Error('Luvus request timed out'));},10000);

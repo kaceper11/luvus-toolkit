@@ -1,5 +1,6 @@
 """Installation, deterministic manifest assembly and non-destructive migration."""
 import json
+from contextlib import closing
 import os
 from pathlib import Path
 import shutil
@@ -95,14 +96,14 @@ def migrate():
     """Preview first; copy durable state without overwriting conflicts."""
     import hashlib
     apply = '--apply' in sys.argv
-    home = Path(os.environ.get('LUVUS_HOME', str(Path.home() / '.luvus')))
+    home = Path((os.environ.get('LUVUS_HOME') or str(Path.home() / '.luvus')))
     moves = []
     excluded = {'worktrees', 'sessions', 'tab-titles', '__pycache__', '.git'}
     combined = {}
     def fingerprint(path):
         digest = hashlib.sha256()
         if path.suffix in ('.sqlite', '.sqlite3', '.db'):
-            with sqlite3.connect(path.as_uri() + '?mode=ro', uri=True) as db:
+            with closing(sqlite3.connect(path.as_uri() + '?mode=ro', uri=True)) as db:
                 for line in db.iterdump(): digest.update(line.encode())
         else:
             with path.open('rb') as stream:
@@ -151,7 +152,7 @@ def migrate():
         os.close(fd)
         try:
             if source.suffix in ('.sqlite', '.sqlite3', '.db'):
-                with sqlite3.connect(source.as_uri() + '?mode=ro', uri=True) as src, sqlite3.connect(temporary) as dst:
+                with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src, closing(sqlite3.connect(temporary)) as dst:
                     src.backup(dst)
             else: shutil.copyfile(source, temporary)
             os.link(temporary, target)

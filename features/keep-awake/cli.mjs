@@ -68,7 +68,7 @@ export async function start(ctx) {
   } finally { await log?.close(); await guard.close(); }
 }
 
-export async function daemon(ctx, { read = observe, lease = assertion(), call = luvus, interval = 5000, signal } = {}) {
+export async function daemon(ctx, { read = observe, lease = assertion(), call = luvus, interval = 5000, signal, identityOf = sessionIdentity, isCurrent = sameSession } = {}) {
   await mkdir(ctx.dir, { recursive: true, mode: 0o700 });
   const owner = await lock(join(ctx.dir, 'helper.lock'));
   if (!owner) { process.send?.({ ready: true }); return; }
@@ -78,12 +78,12 @@ export async function daemon(ctx, { read = observe, lease = assertion(), call = 
   signal?.addEventListener('abort', stop, { once: true });
   let lastText = '';
   try {
-    const identity = await sessionIdentity(ctx);
+    const identity = await identityOf(ctx);
     await writeJSON(join(ctx.dir, 'mode.json'), 'auto');
     process.send?.({ ready: true });
     while (!abort.signal.aborted) {
       let state, mode = 'auto';
-      if (!await sameSession(ctx, identity)) break;
+      if (!await isCurrent(ctx, identity)) break;
       try {
         const data = await read(ctx);
         if (data === null) break;

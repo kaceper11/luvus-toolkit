@@ -18,7 +18,7 @@ class DashboardTests(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix="launcher-ui-")
         self.addCleanup(self.temp.cleanup)
-        self.cwd = str(Path(self.temp.name).resolve())
+        self.cwd = backend.canonical(self.temp.name)
         self.presets = Path(self.cwd) / "presets.json"
         self.environment = patch.dict(os.environ)
         self.environment.start()

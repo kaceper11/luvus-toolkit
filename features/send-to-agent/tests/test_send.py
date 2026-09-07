@@ -148,7 +148,7 @@ class FileTests(unittest.TestCase):
         self.git("init", "-q")
         self.git("config", "user.name", "Test")
         self.git("config", "user.email", "test@example.invalid")
-        (self.root / "a.txt").write_text("one\ntwo\nthree\n")
+        (self.root / "a.txt").write_bytes(b"one\ntwo\nthree\n")
         self.git("add", "a.txt")
         self.git("commit", "-qm", "Initial")
 

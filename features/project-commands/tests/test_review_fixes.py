@@ -45,7 +45,7 @@ class ReviewFixes(unittest.TestCase):
 
     def test_removed_worktree_does_not_block_other_config(self):
         self.configure(self.definition()); previous = self.store.config()
-        shutil.rmtree(self.root)
+        shutil.rmtree(self.root, onerror=lambda function, path, error: (os.chmod(path, 0o700), function(path)))
         second = self.base / 'second'; second.mkdir()
         new = copy.deepcopy(previous); new['projects'][str(second)] = {'commands': [self.definition()]}
         self.store.save_config(new, previous)
@@ -73,7 +73,8 @@ class ReviewFixes(unittest.TestCase):
         d = next(d for d in diag.discover(self.root) if d['id'] == 'web:script:test')
         self.assertEqual(d['cwd'], 'web'); self.assertEqual(d['argv'], ['npm', 'run', 'test'])
         if shutil.which('npm'):
-            result = subprocess.run(d['argv'], cwd=self.root / d['cwd'], env={**os.environ, 'npm_config_cache': str(self.base / 'npm-cache'), 'npm_config_update_notifier': 'false'}, capture_output=True, text=True, timeout=10)
+            from project_commands.model import executable_argv
+            result = subprocess.run(executable_argv(d['argv']), cwd=self.root / d['cwd'], env={**os.environ, 'npm_config_cache': str(self.base / 'npm-cache'), 'npm_config_update_notifier': 'false'}, capture_output=True, text=True, timeout=10)
             self.assertEqual(result.returncode, 0, result.stderr); self.assertIn('WEB_SCRIPT', result.stdout)
 
     def test_health_only_checks_relevant_tools_and_configured_executables(self):

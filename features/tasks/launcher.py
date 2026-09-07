@@ -15,9 +15,6 @@ def main():
             # A clean shell prevents startup files re-exporting tracker credentials.
             command = ["/bin/bash", "--noprofile", "--norc", "-i"]
         os.execvpe(command[0], command, env)
-    python = root.parents[1] / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
-    if python.exists() and Path(sys.prefix).resolve() != (root.parents[1] / ".venv").resolve():
-        return subprocess.call([str(python), str(__file__), *sys.argv[1:]])
     if sys.version_info < (3, 11):
         print("Luvus Tasks requires Python 3.11+. See README.md to create .venv.", file=sys.stderr)
         return 1

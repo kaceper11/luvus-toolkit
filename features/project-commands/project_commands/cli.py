@@ -86,7 +86,7 @@ def main():
         if a.action in ('gated-child', 'posix-child'):
             from .runtime import gated_child, posix_child
             argv = remaining[1:] if remaining[:1] == ['--'] else remaining
-            return gated_child(argv, a.cwd) if a.action == 'gated-child' else posix_child(argv, a.cwd, a.result)
+            return gated_child(argv, a.cwd, a.result) if a.action == 'gated-child' else posix_child(argv, a.cwd, a.result)
         store = Store(a.store)
         host = Host() if os.environ.get('LUVUS_BIN_PATH') else None
         if a.action == 'api':

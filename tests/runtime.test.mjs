@@ -16,6 +16,9 @@ test('pane invocation targets the bundle and the platform entrypoint', async () 
   assert.equal(args[4],await namespace('ai-usage','details-codex','panes'));
 });
 test('power assertions have a bounded native implementation', () => {
+  if (process.platform === 'linux' && !process.env.WSL_DISTRO_NAME && !process.env.WSL_INTEROP) {
+    assert.throws(() => assertionCommand(), /supports macOS/); return;
+  }
   const [file,args]=assertionCommand();
   if(file==='powershell.exe') {
     const code=Buffer.from(args.at(-1),'base64').toString('utf16le');

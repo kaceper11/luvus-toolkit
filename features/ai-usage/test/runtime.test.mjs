@@ -1,3 +1,5 @@
+import { writeExecutable } from '../../../tests/fixture.mjs';
+import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, writeFile, readFile, rm, mkdir, unlink } from 'node:fs/promises';
@@ -11,7 +13,7 @@ import { copilotData } from '../providers.mjs';
 import { readJSON } from '../io.mjs';
 
 const exec = promisify(execFile);
-const cli = new URL('../cli.mjs', import.meta.url).pathname;
+const cli = fileURLToPath(new URL('../cli.mjs', import.meta.url));
 async function until(fn, timeout = 14000) {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) { const result = await fn(); if (result) return result; await new Promise(r => setTimeout(r, 100)); }
@@ -26,16 +28,16 @@ test('Helper publishes, honors settings, deduplicates startup, and exits on disa
   await writeFile(join(configDir, 'settings.json'), JSON.stringify(preferences));
   const env = { ...process.env, LUVUS_MODULE_ID: 'kacper.toolkit', LUVUS_BIN_PATH: binary, LUVUS_SOCKET_PATH: join(dir, 'socket'), LUVUS_PANE_ID: '1', LUVUS_MODULE_STATE_DIR: root, LUVUS_MODULE_CONFIG_DIR: configDir, FIXTURE_DIR: dir };
   const ctx = context(env);
-  await writeFile(binary, `#!/usr/bin/env node
+  await writeExecutable(binary, `#!/usr/bin/env node
 const fs=require('node:fs'),p=require('node:path'),args=process.argv.slice(2),root=process.env.FIXTURE_DIR;
 fs.appendFileSync(p.join(root,'calls.jsonl'),JSON.stringify(args)+'\\n');
 let result={type:'ok'};
 if(args[0]==='module'&&args[1]==='info')result={type:'module_info',enabled:!fs.existsSync(p.join(root,'disabled')),runnable:true};
 if(args[0]==='module'&&args[1]==='settings')result={settings:Object.entries(JSON.parse(fs.readFileSync(p.join(root,'config/settings.json'),'utf8'))).map(([key,value])=>({key:'ai-usage-'+key,value}))};
-if(args[0]==='uhp')result={methods:[]};
+if(args[0]==='uhp')result={methods:[],server_generation:fs.existsSync(p.join(root,'socket'))?fs.statSync(p.join(root,'socket')).birthtimeMs:null};
 console.log(JSON.stringify({result}));
 `, { mode: 0o700 });
-  await writeFile(provider, `#!/usr/bin/env node
+  await writeExecutable(provider, `#!/usr/bin/env node
 require('node:readline').createInterface({input:process.stdin}).on('line',line=>{
 const r=JSON.parse(line);if(r.id===undefined)return;
 const result=r.method==='account/rateLimits/read'?{rateLimits:{primary:{usedPercent:85,resetsAt:Math.floor(Date.now()/1000)+3600}}}:r.method==='thread/list'?{data:[],nextCursor:null}:{};
@@ -92,7 +94,7 @@ async function notificationFixture(t) {
   const dir = await mkdtemp(join(tmpdir(), 'usage-notification-test-'));
   t.after(() => rm(dir, { recursive: true, force: true }));
   const binary = join(dir, 'luvus');
-  await writeFile(binary, `#!/usr/bin/env node
+  await writeExecutable(binary, `#!/usr/bin/env node
 const fs = require('node:fs'), p = require('node:path');
 fs.appendFileSync(p.join(__dirname, 'calls.jsonl'), JSON.stringify(process.argv.slice(2)) + '\\n');
 console.log(JSON.stringify(fs.existsSync(p.join(__dirname, 'fail')) ? {error:{message:'fixture failure'}} : {result:{type:'ok'}}));

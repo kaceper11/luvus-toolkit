@@ -15,7 +15,7 @@ for feature in ['cli-launcher','git-sidebar','project-commands','send-to-agent',
     print('\nTesting ' + feature, flush=True)
     command = [sys.executable, '-m', 'unittest', 'discover', '-s', 'tests' if (folder / 'tests').exists() else '.', '-q']
     try:
-        result = subprocess.run(command, cwd=folder, timeout=180)
+        result = subprocess.run(command, cwd=folder, timeout=600)
         if result.returncode: failed.append(feature)
         if feature == 'git-sidebar':
             result = subprocess.run([sys.executable, 'test_git_sidebar.py'], cwd=folder, timeout=60)

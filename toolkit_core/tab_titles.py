@@ -18,7 +18,7 @@ def title(value):
 def directory():
     base = os.environ.get('LUVUS_TOOLKIT_CONFIG_DIR')
     if not base:
-        base = Path(os.environ.get('LUVUS_HOME', str(Path.home() / '.luvus'))) / 'modules/config' / MODULE_ID
+        base = Path((os.environ.get('LUVUS_HOME') or str(Path.home() / '.luvus'))) / 'modules/config' / MODULE_ID
     return Path(base) / 'tab-titles'
 
 

@@ -8,9 +8,6 @@ import sys
 
 def main():
     root = Path(__file__).resolve().parent
-    python = root.parents[1] / '.venv' / ('Scripts/python.exe' if os.name == 'nt' else 'bin/python')
-    if python.exists() and Path(sys.prefix).resolve() != (root.parents[1] / '.venv').resolve():
-        return subprocess.call([str(python), str(__file__), *sys.argv[1:]])
     if sys.version_info < (3, 11):
         raise SystemExit('Python 3.11+ required. Create .venv using the README.')
     action = sys.argv[1] if len(sys.argv) > 1 else 'ui'

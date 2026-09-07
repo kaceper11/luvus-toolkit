@@ -43,8 +43,8 @@ class AgentLaunchTests(unittest.TestCase):
         self.assertEqual(project.git(dest, "branch", "--show-current"), "work/new")
         self.assertEqual(self.git("branch", "--show-current"), "main")
         params = next(p for m, p in reversed(self.calls) if m == "terminal.backend.create")
-        self.assertEqual(params["cwd"], str(dest))
-        self.assertEqual(params["command"][params["command"].index("--cwd") + 1], str(dest))
+        self.assertEqual(params["cwd"], project.canonical(dest))
+        self.assertEqual(params["command"][params["command"].index("--cwd") + 1], project.canonical(dest))
         with self.assertRaisesRegex(ValueError, "already dispatched"):
             agent.execute(self.config, plan, self.preset, "new", self.rpc)
         self.assertEqual(sum(m == "terminal.backend.create" for m, _ in self.calls), 1)

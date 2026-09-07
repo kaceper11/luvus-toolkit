@@ -8,6 +8,9 @@ import sys
 ROOT = Path(__file__).resolve().parent
 
 def main():
+    if os.name == 'nt' and not sys.flags.utf8_mode:
+        os.environ['PYTHONUTF8'] = '1'
+        return subprocess.call([sys.executable, '-X', 'utf8', str(__file__), *sys.argv[1:]])
     python = ROOT / '.venv' / ('Scripts/python.exe' if os.name == 'nt' else 'bin/python')
     if python.exists() and Path(sys.prefix).resolve() != (ROOT / '.venv').resolve():
         return subprocess.call([str(python), str(__file__), *sys.argv[1:]])

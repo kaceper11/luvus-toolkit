@@ -2,12 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { spawn } from 'node:child_process';
-import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, writeFile, readFile, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { powerStatus, workingCount, decision, assertion, observe } from './awake.mjs';
-import { context, lock, daemon } from './cli.mjs';
+import { context, lock, daemon as runDaemon } from './cli.mjs';
+
+const identityOf = async ctx => {const s=await stat(ctx.socket);return `${s.ino}:${s.birthtimeMs}`;};
+const isCurrent = async (ctx, value) => identityOf(ctx).then(current => current === value).catch(() => false);
+const daemon = (ctx, options) => runDaemon(ctx, {identityOf, isCurrent, ...options});
 
 const battery = (percent, pluggedIn = false) => `Now drawing from '${pluggedIn ? 'AC Power' : 'Battery Power'}'\n -InternalBattery-0 (id=123)\t${percent}%; discharging; 1:00 remaining present: true\n`;
 const data = (count = 1, percent = 80, pluggedIn = false) => ({ count, power: { percent, pluggedIn } });
@@ -44,7 +48,7 @@ test('Auto/On/Off and exact battery boundary', () => {
 test('bounded assertions renew without dropping the old lease first; failures release it', async () => {
   let time = 0, fail = false;
   const children = [];
-  const lease = assertion({ now: () => time, launch(file, args) {
+  const lease = assertion({ nativeCommand: () => ['/usr/bin/caffeinate',['-i','-t','30']], now: () => time, launch(file, args) {
     assert.equal(file, '/usr/bin/caffeinate');
     assert.deepEqual(args, ['-i', '-t', '30']);
     const child = Object.assign(new EventEmitter(), { pid: children.length + 1, exitCode: null, signalCode: null, kills: 0 });

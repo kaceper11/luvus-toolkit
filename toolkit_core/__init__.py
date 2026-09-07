@@ -20,7 +20,7 @@ def directory(feature, kind='config'):
         raise ValueError('Unknown toolkit feature or directory kind')
     base = os.environ.get('LUVUS_TOOLKIT_' + kind.upper() + '_DIR')
     if not base:
-        base = Path(os.environ.get('LUVUS_HOME', str(Path.home() / '.luvus'))) / 'modules' / kind / MODULE
+        base = Path((os.environ.get('LUVUS_HOME') or str(Path.home() / '.luvus'))) / 'modules' / kind / MODULE
     return Path(base) / 'features' / feature
 
 def configure(feature):
@@ -32,7 +32,7 @@ def configure(feature):
         key = 'LUVUS_TOOLKIT_' + kind + '_DIR'
         if not os.environ.get(key):
             base = os.environ.get('LUVUS_MODULE_' + kind + '_DIR') if os.environ.get('LUVUS_MODULE_ID') == MODULE else None
-            os.environ[key] = base or str(Path(os.environ.get('LUVUS_HOME', str(Path.home() / '.luvus'))) / 'modules' / kind.lower() / MODULE)
+            os.environ[key] = base or str(Path((os.environ.get('LUVUS_HOME') or str(Path.home() / '.luvus'))) / 'modules' / kind.lower() / MODULE)
         os.environ['LUVUS_MODULE_' + kind + '_DIR'] = str(directory(feature, kind.lower()))
     os.environ['LUVUS_TOOLKIT_FEATURE'] = feature
     os.environ['LUVUS_MODULE_ID'] = MODULE

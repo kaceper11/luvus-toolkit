@@ -65,11 +65,23 @@ class WindowsJob:
         if self.handle: self.k.CloseHandle(self.handle); self.handle = None
 
 
-def gated_child(argv, cwd):
+def run_and_record(argv, cwd, result_path):
+    try:
+        code = subprocess.call(argv, cwd=cwd, stdin=subprocess.DEVNULL)
+        result = {'exit_code': code}
+    except OSError as e:
+        result = {'spawn_error': str(e)}
+    temporary = Path(str(result_path) + '.tmp')
+    temporary.write_text(json.dumps(result))
+    os.replace(temporary, result_path)
+    return result.get('exit_code', 125)
+
+
+def gated_child(argv, cwd, result_path):
     """EOF means the parent died before owning this Windows helper: spawn nothing."""
     import sys
     if sys.stdin.buffer.read(1) != b'G': return 125
-    return subprocess.call(argv, cwd=cwd, stdin=subprocess.DEVNULL)
+    return run_and_record(argv, cwd, result_path)
 
 
 def posix_child(argv, cwd, result_path):
@@ -82,14 +94,7 @@ def posix_child(argv, cwd, result_path):
         sys.stdin.buffer.read()
         os.killpg(os.getpgrp(), signal.SIGKILL)
     threading.Thread(target=owner_closed, daemon=True).start()
-    try:
-        code = subprocess.call(argv, cwd=cwd, stdin=subprocess.DEVNULL)
-        result = {'exit_code': code}
-    except OSError as e:
-        result = {'spawn_error': str(e)}
-    temporary = Path(str(result_path) + '.tmp')
-    temporary.write_text(json.dumps(result))
-    os.replace(temporary, result_path)
+    run_and_record(argv, cwd, result_path)
     os.close(1); os.close(2)
     # The watchdog kills this still-owned group on supervisor exit, including crashes.
     while True: time.sleep(3600)
@@ -261,7 +266,7 @@ def supervise(store, identity, host=None):
         exit_path = store.logs / identity / 'exit.json'
         if os.name == 'nt':
             job = WindowsJob()
-            child = subprocess.Popen(entry_args('gated-child', '--cwd', cwd, '--', *args), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+            child = subprocess.Popen(entry_args('gated-child', '--cwd', cwd, '--result', exit_path, '--', *args), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
             try:
                 job.assign(child)
                 child.stdin.write(b'G'); child.stdin.flush(); child.stdin.close()
@@ -323,7 +328,7 @@ def supervise(store, identity, host=None):
                 if command_ended and not eof and time.monotonic() - child._ended_at > 2:
                     changed = True
                     break
-        outcome = json.loads(exit_path.read_text()) if os.name != 'nt' and exit_path.exists() else {}
+        outcome = json.loads(exit_path.read_text()) if exit_path.exists() else {}
         code = outcome.get('exit_code', child.poll())
         if 'spawn_error' in outcome:
             store.update(identity, state='failed', error=outcome['spawn_error'], freshness='unknown', finished=time.time())

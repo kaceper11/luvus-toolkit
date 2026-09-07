@@ -149,7 +149,7 @@ def snapshot(root, d):
 
 class Store:
     def __init__(self, directory=None):
-        home = Path(os.environ.get('LUVUS_HOME', Path.home() / '.luvus'))
+        home = Path((os.environ.get('LUVUS_HOME') or Path.home() / '.luvus'))
         injected = os.environ.get('LUVUS_MODULE_CONFIG_DIR') if os.environ.get('LUVUS_TOOLKIT_FEATURE') == 'project-commands' else None
         self.root = Path(directory or injected or home / 'modules/config' / 'kacper.toolkit' / 'features' / 'project-commands').resolve()
         self.root.mkdir(parents=True, exist_ok=True, mode=0o700)

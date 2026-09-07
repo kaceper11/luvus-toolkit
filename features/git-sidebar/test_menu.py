@@ -47,7 +47,7 @@ class ViewTests(unittest.TestCase):
                 if args[:2] == ('pane', 'processes'): return processes[args[2]]
                 if args[:3] == ('module', 'pane', 'focus'): active = args[3]; return {}
                 if args[:2] == ('pane', 'list'):
-                    return {'panes': [{'pane': active, 'focused': True, 'module': {'id':git.MODULE, 'entrypoint':'lazygit-terminal'}}]}
+                    return {'panes': [{'pane': active, 'focused': True, 'module': {'id':'kacper.toolkit', 'entrypoint':'git-sidebar-lazygit-terminal-windows' if os.name == 'nt' else 'git-sidebar-lazygit-terminal'}}]}
                 return {}
             with patch.dict(os.environ, {'LUVUS_MODULE_STATE_DIR': state, 'LUVUS_SOCKET_PATH': '/synthetic'}), \
                  patch.object(git, 'validate', return_value=state), patch.object(git, 'luvus', side_effect=host), patch.object(git, 'progress'):

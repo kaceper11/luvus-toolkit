@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, writeFile, readFile, rm, mkdir, stat } from 'node:fs/promises';
@@ -119,7 +120,7 @@ test('Claude connection and removal preserve unrelated settings and renderer byt
   const connected = JSON.parse(await readFile(file, 'utf8'));
   assert.equal(connected.statusLine.padding, 2);
   const input = '{"session_id":"session","context_window":{"total_input_tokens":5,"total_output_tokens":1}}';
-  const cli = new URL('../cli.mjs', import.meta.url).pathname;
+  const cli = fileURLToPath(new URL('../cli.mjs', import.meta.url));
   const child = spawn(process.execPath, [cli, 'claude-feed', root], { stdio: ['pipe', 'pipe', 'pipe'] });
   let output = ''; child.stdout.on('data', c => { output += c; }); child.stdin.end(input);
   await new Promise(resolve => child.on('exit', resolve)); assert.equal(output, input);

@@ -15,7 +15,7 @@ class AdapterTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.cwd = str(Path(self.temp.name).resolve())
+        self.cwd = project.canonical(self.temp.name)
         self.definition = {"id": "web", "name": "Web", "kind": "service", "category": "custom",
                            "argv": ["server"], "urls": ["http://localhost:3210"]}
         self.session = {"socket": "/test/socket", "generation": "a" * 32}
