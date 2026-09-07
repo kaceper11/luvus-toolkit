@@ -8,7 +8,8 @@ import tempfile
 import time
 ROOT=Path(__file__).resolve().parents[1]
 binary=os.environ['LUVUS_BIN_PATH']
-with tempfile.TemporaryDirectory(prefix='ltk-',dir='/tmp' if os.name != 'nt' else None) as home:
+temporary=tempfile.TemporaryDirectory(prefix='ltk-',dir='/tmp' if os.name != 'nt' else None)
+with temporary as home:
     env={k:v for k,v in os.environ.items() if not k.startswith('LUVUS_')}
     env.update(LUVUS_HOME=home,LUVUS_BIN_PATH=binary)
     if os.name != 'nt': env['LUVUS_SOCKET_PATH']=str(Path(home)/'luvus.sock')
@@ -58,4 +59,15 @@ with tempfile.TemporaryDirectory(prefix='ltk-',dir='/tmp' if os.name != 'nt' els
         assert not [log for log in logs if log.get('status')=='failed'],logs
         print('PASS: all native module command logs succeeded',flush=True)
     finally:
-        cli('server','stop')
+        try:
+            cli('module','disable','kacper.toolkit')
+        finally:
+            cli('server','stop')
+        for attempt in range(30):
+            try:
+                temporary.cleanup()
+                break
+            except PermissionError:
+                if attempt == 29: raise
+                time.sleep(0.5)
+        print('PASS: disposable server and files cleaned up',flush=True)

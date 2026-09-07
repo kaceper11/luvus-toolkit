@@ -446,14 +446,17 @@ class ConsoleTests(unittest.IsolatedAsyncioTestCase):
                 await pilot.pause()
                 await wait_until(pilot, lambda: bool(self.app.query("#editor-sections")))
                 self.app.query_one("#editor-sections", TabbedContent).active = "editor-prompt"
+                await wait_until(pilot, lambda: self.app.query("#prompt-preset") and self.app.query_one("#prompt-preset", Select).value is not Select.NULL)
                 self.app.query_one("#prompt-preset", Select).value = "Review"
                 await pilot.pause()
                 self.assertIn("Report findings; do not edit files", self.app.query_one("#opening-prompt", TextArea).text)
                 await pilot.click("#editor-review")
                 await pilot.pause()
                 start.assert_not_called()
+                await wait_until(pilot, lambda: bool(self.app.screen.query("#submit")))
                 await pilot.click("#submit")  # final confirmation
                 await pilot.pause()
+                await wait_until(pilot, lambda: start.call_count == 1)
                 start.assert_called_once()
                 self.assertEqual(self.app.store.records("handovers")[0]["stage"], "delivered")
 
