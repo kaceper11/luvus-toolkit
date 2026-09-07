@@ -59,7 +59,7 @@ At cutover, disable the old modules and wait for their workers to stop, then app
 python3 toolkit.py migrate --apply
 ```
 
-Migration copies durable records and settings into the toolkit's feature directories. It retains source data, existing worktrees and credential-store references. Conflicting destination data stops migration; rerunning with unchanged source data is safe. Transient helper locks and sessions are recreated. Do not use migration as a cross-computer credential or workspace-path synchronization tool.
+Migration copies durable records and settings into the toolkit's feature directories. Recognized standalone Launcher bridges are rewritten to Toolkit entrypoints; custom integration commands are retained and must be checked before removing their source code. It retains source data, existing worktrees and credential-store references. Conflicting destination data stops migration; rerunning with unchanged source data is safe. Transient helper locks and sessions are recreated. Do not use migration as a cross-computer credential or workspace-path synchronization tool.
 
 A connected Claude status-line wrapper must be restored using the old module before reconnecting through Toolkit. Restoration refuses to overwrite external edits. Keep the old code until the wrapper has been reconnected and checked.
 

@@ -92,6 +92,36 @@ def doctor():
     return 0 if all(checks.values()) else 1
 
 
+
+def migrated_bytes(path):
+    """Rewrite only recognized standalone Launcher bridges; preserve custom argv."""
+    raw = path.read_bytes()
+    if path.name != 'projects.json': return raw
+    data = json.loads(raw)
+    providers = data.get('providers', {}) if isinstance(data, dict) else {}
+    changed = False
+    python = str(ROOT / '.venv' / ('Scripts/python.exe' if os.name == 'nt' else 'bin/python'))
+    dispatcher = str(ROOT / 'toolkit.py')
+    def standalone(argv, feature, script):
+        if not isinstance(argv, list) or len(argv) < 2: return False
+        source = Path(argv[1])
+        expected = source.parent / '.venv' / ('Scripts/python.exe' if os.name == 'nt' else 'bin/python')
+        return source.name == script and source.parent.name == 'luvus-' + feature and Path(argv[0]) == expected
+    tasks = providers.get('tasks')
+    if (standalone(tasks, 'tasks', 'launcher.py') and len(tasks) == 4 and tasks[2] == 'bundle-api'
+            and Path(tasks[3]) == path.parent.parent / FEATURES['tasks']):
+        providers['tasks'] = [python, dispatcher, 'run', 'tasks', 'launcher.py', 'bundle-api', str(directory('tasks'))]
+        changed = True
+    commands = providers.get('commands')
+    if (standalone(commands, 'cli-launcher', 'commands_adapter.py') and len(commands) == 7
+            and standalone(commands[2:], 'project-commands', 'launcher.py') and commands[4:6] == ['api', '--store']
+            and Path(commands[6]) == path.parent.parent / FEATURES['project-commands']):
+        providers['commands'] = [python, str(ROOT / 'features/cli-launcher/commands_adapter.py'),
+                                python, dispatcher, 'run', 'project-commands', 'launcher.py', 'api', '--store', str(directory('project-commands'))]
+        changed = True
+    return (json.dumps(data, indent=2) + '\n').encode() if changed else raw
+
+
 def migrate():
     """Preview first; copy durable state without overwriting conflicts."""
     import hashlib
@@ -106,8 +136,7 @@ def migrate():
             with closing(sqlite3.connect(path.as_uri() + '?mode=ro', uri=True)) as db:
                 for line in db.iterdump(): digest.update(line.encode())
         else:
-            with path.open('rb') as stream:
-                for chunk in iter(lambda: stream.read(1048576), b''): digest.update(chunk)
+            digest.update(migrated_bytes(path))
         return digest.hexdigest()
     for feature, old in FEATURES.items():
         source = home / 'modules/config' / old
@@ -154,7 +183,7 @@ def migrate():
             if source.suffix in ('.sqlite', '.sqlite3', '.db'):
                 with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src, closing(sqlite3.connect(temporary)) as dst:
                     src.backup(dst)
-            else: shutil.copyfile(source, temporary)
+            else: Path(temporary).write_bytes(migrated_bytes(source))
             os.link(temporary, target)
         finally: os.unlink(temporary)
     if combined and combined != existing:

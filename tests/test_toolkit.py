@@ -55,7 +55,15 @@ class ToolkitTests(unittest.TestCase):
             (source/'worktrees').mkdir();(source/'worktrees/private').write_text('leave here')
             with contextlib.closing(sqlite3.connect(source/'tasks.sqlite3')) as db, db:
                 db.execute('create table records (value text)');db.execute("insert into records values ('saved')")
+            launcher = Path(tmp)/'modules/config/personal.luvus-cli-launcher';launcher.mkdir()
+            old = Path(tmp)/'luvus-tasks'
+            interpreter = old/'.venv'/('Scripts/python.exe' if os.name == 'nt' else 'bin/python')
+            (launcher/'projects.json').write_text(json.dumps({'providers': {'tasks': [str(interpreter), str(old/'launcher.py'), 'bundle-api', str(source)], 'custom': ['unchanged']}}))
             migrate();migrate()
+            providers = json.loads((directory('cli-launcher')/'projects.json').read_text())['providers']
+            self.assertIn(str(ROOT/'toolkit.py'), providers['tasks'])
+            self.assertEqual(providers['tasks'][-1], str(directory('tasks')))
+            self.assertEqual(providers['custom'], ['unchanged'])
             target=directory('tasks')
             self.assertFalse((target/'worktrees').exists())
             with contextlib.closing(sqlite3.connect(target/'tasks.sqlite3')) as db:self.assertEqual(db.execute('select value from records').fetchone()[0],'saved')

@@ -2,11 +2,12 @@
 
 ## macOS
 
-- 374 Python unittest checks passed across the feature suites and toolkit migration/transport checks.
+- 375 Python unittest checks passed across the feature suites and toolkit migration/transport checks.
 - 39 Node checks passed, including worker lifetime, quotas, status-line preservation, native locks and namespace routing.
 - An isolated Luvus 0.13.4 server accepted the root manifest. Tasks, Project Commands and Send to Agent panes opened; startup/event/module command logs had no failures.
 - A fresh installation from public commit `5b9df1f` passed its native build and doctor checks in a disposable home.
 - The native power assertion helper expired after parent exit within 40 seconds; actual host power requests still need inspection.
+- Real durable configuration copied successfully to an isolated destination, with known Launcher connections rewritten to Toolkit. Production cutover remains pending.
 - Original module checkouts and live registrations have not been removed or replaced.
 
 ## Required before final cutover and deletion
