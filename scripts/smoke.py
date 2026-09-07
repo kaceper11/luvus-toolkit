@@ -3,15 +3,17 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import time
 ROOT=Path(__file__).resolve().parents[1]
 binary=os.environ['LUVUS_BIN_PATH']
 with tempfile.TemporaryDirectory(prefix='ltk-',dir='/tmp' if os.name != 'nt' else None) as home:
     env={k:v for k,v in os.environ.items() if not k.startswith('LUVUS_')}
-    env.update(LUVUS_HOME=home,LUVUS_BIN_PATH=binary,LUVUS_SOCKET_PATH=str(Path(home)/'luvus.sock'))
+    env.update(LUVUS_HOME=home,LUVUS_BIN_PATH=binary)
+    if os.name != 'nt': env['LUVUS_SOCKET_PATH']=str(Path(home)/'luvus.sock')
     def cli(*args):
-        p=subprocess.run([binary,*args],env=env,capture_output=True,text=True,timeout=30)
+        p=subprocess.run([binary,*args],env=env,capture_output=True,text=True,timeout=180)
         if p.returncode:raise AssertionError(p.stdout+p.stderr)
         try:result=json.loads(p.stdout)
         except ValueError:return p.stdout
@@ -19,7 +21,13 @@ with tempfile.TemporaryDirectory(prefix='ltk-',dir='/tmp' if os.name != 'nt' els
         return result.get('result',result)
     try:
         cli('server','start')
-        cli('module','link',str(ROOT),'--disabled')
+        if '--install' in sys.argv:
+            settings=Path(home)/'modules/config/kacper.toolkit/settings.json'
+            settings.parent.mkdir(parents=True)
+            settings.write_text(json.dumps({'ai-usage-enabled':False,'keep-awake-enabled':False}))
+            cli('module','install','kaceper11/luvus-toolkit','--ref',os.environ['GITHUB_SHA'],'--yes')
+        else:
+            cli('module','link',str(ROOT),'--disabled')
         for feature in ('ai-usage','keep-awake'):
             cli('module','settings','kacper.toolkit',feature+'-enabled','false')
         fixture=Path(home)/'fixture';fixture.mkdir()
