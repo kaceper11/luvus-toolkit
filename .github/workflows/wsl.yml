@@ -9,10 +9,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install disposable Ubuntu distribution
+        timeout-minutes: 5
         shell: pwsh
         run: |
           wsl --status
-          wsl --install --distribution Ubuntu-24.04 --no-launch
+          wsl --install --web-download --distribution Ubuntu-24.04 --no-launch
           if ($LASTEXITCODE -ne 0) { throw 'WSL distribution installation failed' }
           wsl --list --verbose
       - name: Validate inside WSL2

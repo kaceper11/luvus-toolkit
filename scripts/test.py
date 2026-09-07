@@ -13,7 +13,7 @@ os.environ['LUVUS_HOME'] = state.name
 for feature in ['cli-launcher','git-sidebar','project-commands','send-to-agent','tasks']:
     folder = ROOT / 'features' / feature
     print('\nTesting ' + feature, flush=True)
-    command = [sys.executable, '-c', 'import faulthandler, unittest; faulthandler.dump_traceback_later(120, repeat=True); unittest.main(module=None)', 'discover', '-s', 'tests' if (folder / 'tests').exists() else '.', '-v']
+    command = [sys.executable, '-X', 'faulthandler', '-m', 'unittest', 'discover', '-s', 'tests' if (folder / 'tests').exists() else '.', '-v']
     try:
         result = subprocess.run(command, cwd=folder, timeout=900 if os.name == 'nt' and feature == 'tasks' else 600)
         if result.returncode: failed.append(f'{feature} (exit {result.returncode})')
