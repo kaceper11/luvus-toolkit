@@ -31,6 +31,8 @@ Under WSL2, install Luvus, Python, Node and development tools in the distributio
 
 ## Develop and extend
 
+Run the development commands from the repository root:
+
 ```sh
 python3 toolkit.py bootstrap
 python3 toolkit.py manifest
